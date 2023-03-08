@@ -1,12 +1,21 @@
+import 'package:card_game_degree_project/game/game.dart';
+import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flame/flame.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // This opens the app in fullscreen mode.
+  await Flame.device.fullScreen();
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,
-  ]).then((value) => runApp(const MyApp()));
-  runApp(const MyApp());
+  ]); //.then((value) => runApp(const MyApp()));
+  //runApp(const MyApp());
+  CardGame game = CardGame();
+  runApp(GameWidget(game: game));
 }
 
 class MyApp extends StatelessWidget {
@@ -15,11 +24,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Card Game',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Home Page'),
     );
   }
 }
