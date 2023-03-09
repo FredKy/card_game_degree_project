@@ -26,6 +26,10 @@ class CardGame extends FlameGame
   Future<void> onLoad() async {
     await Flame.images.load('20.png');
     final sprite = await loadSprite('20.png');
+    double maxSide = min(size.x, size.y);
+    print(size.x);
+    print(size.y);
+    camera.viewport = FixedResolutionViewport(Vector2(6 * 1920, 6 * 1080));
     print(sprite.srcSize);
 
     /* add(
@@ -62,8 +66,12 @@ class CardGame extends FlameGame
       ..viewfinder.position = Vector2(cardWidth * 3.5 + cardGap * 4, 0)
       ..viewfinder.anchor = Anchor.topCenter;
     add(camera); */
-    Card myCard = Card(id: 1000);
-    //..position = Vector2(100 + 3 * 1150, 100 + 2 * 1500);
+    Card myCard = Card(id: 1000)
+      ..scale = Vector2(0, 0)
+      ..anchor = Anchor.center
+      ..position = Vector2(100 + 5 * 1150, 100 + 3* 1500);
+    myCard.flip();
+
     add(myCard);
 
     /* world.add(SpriteComponent(
@@ -94,7 +102,16 @@ class CardGame extends FlameGame
     //print(World().children);
     for (final child in children) {
       if (child is Card) {
-        print(child.toString());
+        if (child.scale.length < 1) {
+          child.scale += Vector2(0.01, 0.01);
+        }
+        var a = 500 * dt;
+        //double power = -0.01*pow(a, 2).toDouble();
+        //child.position += Vector2(a, power);
+        child.angle -= dt * 1 * pi;
+        child.position += Vector2(-40, 100*sin(1* child.angle));
+
+        //print(child.toString());
       }
     }
     //children.firstWhere((value) => );
