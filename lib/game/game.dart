@@ -36,10 +36,14 @@ class CardGame extends FlameGame
         ..anchor = Anchor.center,
     ); */
 
-    final world = World();
+    /* final world = World();
     add(world);
 
-    final random = Random();
+    Card myCard = Card(id: 1000)
+      ..position = Vector2(100 + 3 * 1150, 100 + 2 * 1500)
+      ..addToParent(world); */
+
+    /* final random = Random();
     for (var i = 0; i < 7; i++) {
       for (var j = 0; j < 4; j++) {
         final card = Card(id: i * j)
@@ -50,21 +54,24 @@ class CardGame extends FlameGame
           card.flip();
         }
       }
-    }
+    } */
 
-    world.add(SpriteComponent(
-        sprite: Sprite(
-      Flame.images.fromCache('20.png'),
-      srcPosition: Vector2(300, 300),
-      srcSize: Vector2(512, 512),
-    )));
-
-    final camera = CameraComponent(world: world)
+    /* final camera = CameraComponent(world: world)
       ..viewfinder.visibleGameSize =
           Vector2(cardWidth * 7 + cardGap * 8, 4 * cardHeight + 3 * cardGap)
       ..viewfinder.position = Vector2(cardWidth * 3.5 + cardGap * 4, 0)
       ..viewfinder.anchor = Anchor.topCenter;
-    add(camera);
+    add(camera); */
+    Card myCard = Card(id: 1000);
+    //..position = Vector2(100 + 3 * 1150, 100 + 2 * 1500);
+    add(myCard);
+
+    /* world.add(SpriteComponent(
+        sprite: Sprite(
+      Flame.images.fromCache('20.png'),
+      srcPosition: Vector2(300, 300),
+      srcSize: Vector2(512, 512),
+    ))); */
 
     /* add(
       SpriteComponent(
@@ -74,6 +81,23 @@ class CardGame extends FlameGame
         anchor: Anchor.center,
       ),
     ); */
+
+    //children.register<Card>();
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    //final allPositionComponents = children.query<PositionComponent>();
+    //print(dt);
+    //print(World().children);
+    for (final child in children) {
+      if (child is Card) {
+        print(child.toString());
+      }
+    }
+    //children.firstWhere((value) => );
   }
 }
 
