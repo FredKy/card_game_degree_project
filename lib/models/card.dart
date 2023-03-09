@@ -11,6 +11,11 @@ class Card extends PositionComponent with DragCallbacks {
   String? imageAssetPath;
 
   bool _faceUp = false;
+  double frame;
+
+  set setFrame(double dt) {
+    frame = dt;
+  }
 
   bool get isFaceUp => _faceUp;
   void flip() => _faceUp = !_faceUp;
@@ -23,7 +28,11 @@ class Card extends PositionComponent with DragCallbacks {
     this.cost = 0,
     this.power = 0,
     this.imageAssetPath,
-  });
+    this.frame = 0,
+  }) : super(size: CardGame.cardSize);
+
+  @override
+  String toString() => "Test";
 
   @override
   void render(Canvas canvas) {
@@ -60,15 +69,15 @@ class Card extends PositionComponent with DragCallbacks {
   }
 
   static final Paint frontBackgroundPaint = Paint()
-    ..color = const Color.fromARGB(255, 122, 122, 122);
+    ..color = Color.fromARGB(255, 104, 104, 104);
   static final Paint redBorderPaint = Paint()
     ..color = const Color(0xffece8a3)
     ..style = PaintingStyle.stroke
     ..strokeWidth = 10;
   static final Paint blackBorderPaint = Paint()
-    ..color = const Color(0xff7ab2e8)
+    ..color = const Color.fromARGB(255, 68, 68, 68)
     ..style = PaintingStyle.stroke
-    ..strokeWidth = 10;
+    ..strokeWidth = 40;
 
   static late final Sprite redJack = cardGameSprite(0, 0, 512, 512);
 
@@ -78,16 +87,20 @@ class Card extends PositionComponent with DragCallbacks {
       cardRRect,
       blackBorderPaint,
     );
+    flameSprite.render(canvas,
+        position: Vector2(size.x / 2, size.y * (0.38)),
+        anchor: Anchor.center,
+        size: flameSprite.srcSize.scaled(1.88));
   }
 
   static final Paint backBackgroundPaint = Paint()
-    ..color = const Color(0xff380c02);
+    ..color = Color.fromARGB(255, 40, 7, 0);
   static final Paint backBorderPaint1 = Paint()
-    ..color = const Color(0xffdbaf58)
+    ..color = Color.fromARGB(255, 65, 20, 0)
     ..style = PaintingStyle.stroke
     ..strokeWidth = 10;
   static final Paint backBorderPaint2 = Paint()
-    ..color = const Color(0x5CEF971B)
+    ..color = Color.fromARGB(92, 158, 58, 0)
     ..style = PaintingStyle.stroke
     ..strokeWidth = 35;
   static final RRect cardRRect = RRect.fromRectAndRadius(
@@ -95,12 +108,14 @@ class Card extends PositionComponent with DragCallbacks {
     const Radius.circular(CardGame.cardRadius),
   );
   static final RRect backRRectInner = cardRRect.deflate(40);
-  static late final Sprite flameSprite = cardGameSprite(1367, 6, 512, 512);
+  static late final Sprite flameSprite = cardGameSprite(0, 0, 512, 384);
 
   void _renderBack(Canvas canvas) {
+    canvas.rotate(frame * 2 * pi);
     canvas.drawRRect(cardRRect, backBackgroundPaint);
     canvas.drawRRect(cardRRect, backBorderPaint1);
     canvas.drawRRect(backRRectInner, backBorderPaint2);
-    flameSprite.render(canvas, position: size / 2, anchor: Anchor.center);
+    /* flameSprite.render(canvas,
+        position: Vector2(300, 300), anchor: Anchor.center); */
   }
 }
