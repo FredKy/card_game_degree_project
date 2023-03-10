@@ -1,12 +1,10 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:card_game_degree_project/game/player.dart';
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
-import 'package:flame/widgets.dart';
 
 import '../models/card.dart';
 
@@ -27,13 +25,7 @@ class CardGame extends FlameGame
   @override
   Future<void> onLoad() async {
     await Flame.images.load('aeromancer_spritesheet.png');
-    await Flame.images.load('20.png');
-    final sprite = await loadSprite('20.png');
-    double maxSide = min(size.x, size.y);
-    print(size.x);
-    print(size.y);
     camera.viewport = FixedResolutionViewport(Vector2(6 * 1920, 6 * 1080));
-    print(sprite.srcSize);
 
     /* add(
       Player()
@@ -69,13 +61,21 @@ class CardGame extends FlameGame
       ..viewfinder.position = Vector2(cardWidth * 3.5 + cardGap * 4, 0)
       ..viewfinder.anchor = Anchor.topCenter;
     add(camera); */
-    Card myCard = Card(id: 1000)
+    Card myCard = Card(id: 1000, description: "Ice Cannon")
       ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
       ..anchor = Anchor.center
-      ..position = Vector2(100 + 5 * 1150, 100 + 3 * 1500);
+      ..position = Vector2(100 + 5 * 1150, 100 + 2 * 1500);
     myCard.flip();
 
+    Card mySecondCard =
+        Card(id: 1000, description: "Warp Time", imageNumber: 29)
+          ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
+          ..anchor = Anchor.center
+          ..position = Vector2(100 + 6 * 1150, 100 + 2 * 1500);
+    mySecondCard.flip();
+
     add(myCard);
+    add(mySecondCard);
 
     /* world.add(SpriteComponent(
         sprite: Sprite(

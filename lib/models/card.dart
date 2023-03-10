@@ -1,13 +1,23 @@
+import 'dart:async';
 import 'dart:math';
-import 'dart:ui';
+//import 'dart:ui' hide TextStyle;
+import 'package:flutter/painting.dart';
 
 import 'package:card_game_degree_project/game/game.dart';
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 
+const style = TextStyle(
+    color: Color.fromARGB(255, 231, 231, 231),
+    fontSize: 120,
+    fontFamily: 'Yoster');
+final regular = TextPaint(style: style);
+
 class Card extends PositionComponent with DragCallbacks {
   String name, description, type;
   int id, cost, power, imageNumber;
+
+  TextComponent textComponent = TextComponent();
 
   bool _faceUp = false;
   double frame;
@@ -68,7 +78,7 @@ class Card extends PositionComponent with DragCallbacks {
   }
 
   static final Paint frontBackgroundPaint = Paint()
-    ..color = Color.fromARGB(255, 104, 104, 104);
+    ..color = const Color.fromARGB(255, 104, 104, 104);
   static final Paint redBorderPaint = Paint()
     ..color = const Color(0xffece8a3)
     ..style = PaintingStyle.stroke
@@ -78,7 +88,10 @@ class Card extends PositionComponent with DragCallbacks {
     ..style = PaintingStyle.stroke
     ..strokeWidth = 40;
 
-  static late final Sprite redJack = cardGameSprite(0, 0, 512, 512);
+  static late final Sprite iceCannonSprite =
+      cardGameSprite(19 * 256, 0, 256, 192);
+  static late final Sprite warpTimeSprite =
+      cardGameSprite(29 * 256, 64, 256, 192);
 
   void _renderFront(Canvas canvas) {
     canvas.drawRRect(cardRRect, frontBackgroundPaint);
@@ -94,22 +107,22 @@ class Card extends PositionComponent with DragCallbacks {
             size: iceCannonSprite.srcSize.scaled(3.765));
         break;
       default:
-        iceCannonSprite.render(canvas,
+        warpTimeSprite.render(canvas,
             position: Vector2(size.x / 2, size.y * (0.38)),
             anchor: Anchor.center,
-            size: iceCannonSprite.srcSize.scaled(3.765));
+            size: warpTimeSprite.srcSize.scaled(3.765));
         break;
     }
   }
 
   static final Paint backBackgroundPaint = Paint()
-    ..color = Color.fromARGB(255, 40, 7, 0);
+    ..color = const Color.fromARGB(255, 40, 7, 0);
   static final Paint backBorderPaint1 = Paint()
-    ..color = Color.fromARGB(255, 65, 20, 0)
+    ..color = const Color.fromARGB(255, 65, 20, 0)
     ..style = PaintingStyle.stroke
     ..strokeWidth = 10;
   static final Paint backBorderPaint2 = Paint()
-    ..color = Color.fromARGB(92, 158, 58, 0)
+    ..color = const Color.fromARGB(92, 158, 58, 0)
     ..style = PaintingStyle.stroke
     ..strokeWidth = 35;
   static final RRect cardRRect = RRect.fromRectAndRadius(
@@ -117,8 +130,6 @@ class Card extends PositionComponent with DragCallbacks {
     const Radius.circular(CardGame.cardRadius),
   );
   static final RRect backRRectInner = cardRRect.deflate(40);
-  static late final Sprite iceCannonSprite =
-      cardGameSprite(19 * 256, 0, 256, 192);
 
   void _renderBack(Canvas canvas) {
     canvas.rotate(frame * 2 * pi);
@@ -127,5 +138,17 @@ class Card extends PositionComponent with DragCallbacks {
     canvas.drawRRect(backRRectInner, backBorderPaint2);
     /* flameSprite.render(canvas,
         position: Vector2(300, 300), anchor: Anchor.center); */
+  }
+
+  @override
+  FutureOr<void> onLoad() {
+    super.onLoad();
+
+    textComponent
+      ..text = description
+      ..textRenderer = regular
+      ..anchor = Anchor.center
+      ..position = Vector2(size.x / 2, 90);
+    add(textComponent);
   }
 }

@@ -87,5 +87,21 @@ flutter:
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #
+  fonts:
+    - family: Yoster
+      fonts:
+        - asset: assets/fonts/Yoster.ttf
+
+  #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+  # fonts:
+  #   - family: Sol-Schori
+  #     fonts:
+  #       - asset: fonts/Sol-Schori.ttf
+  #   - family: Sol-Schori-Bold
+  #     fonts:
+  #       - asset: fonts/Sol-Schori-Bold.ttf
+  #   - family: Lexend-Regular
+  #     fonts:
+  #       - asset: assets/fonts/Lexend-Regular.ttf
