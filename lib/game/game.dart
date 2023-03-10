@@ -22,8 +22,11 @@ class CardGame extends FlameGame
     const Radius.circular(cardRadius),
   );
 
+  bool animated = false;
+
   @override
   Future<void> onLoad() async {
+    await Flame.images.load('aeromancer_spritesheet.png');
     await Flame.images.load('20.png');
     final sprite = await loadSprite('20.png');
     double maxSide = min(size.x, size.y);
@@ -67,9 +70,9 @@ class CardGame extends FlameGame
       ..viewfinder.anchor = Anchor.topCenter;
     add(camera); */
     Card myCard = Card(id: 1000)
-      ..scale = Vector2(0, 0)
+      ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
       ..anchor = Anchor.center
-      ..position = Vector2(100 + 5 * 1150, 100 + 3* 1500);
+      ..position = Vector2(100 + 5 * 1150, 100 + 3 * 1500);
     myCard.flip();
 
     add(myCard);
@@ -97,30 +100,30 @@ class CardGame extends FlameGame
   void update(double dt) {
     super.update(dt);
 
-    //final allPositionComponents = children.query<PositionComponent>();
-    //print(dt);
-    //print(World().children);
-    for (final child in children) {
-      if (child is Card) {
-        if (child.scale.length < 1) {
-          child.scale += Vector2(0.01, 0.01);
-        }
-        var a = 500 * dt;
-        //double power = -0.01*pow(a, 2).toDouble();
-        //child.position += Vector2(a, power);
-        child.angle -= dt * 1 * pi;
-        child.position += Vector2(-40, 100*sin(1* child.angle));
+    if (animated) {
+      for (final child in children) {
+        if (child is Card) {
+          if (child.scale.length < 1) {
+            child.scale += Vector2(0.01, 0.01);
+          }
+          var a = 500 * dt;
+          //double power = -0.01*pow(a, 2).toDouble();
+          //child.position += Vector2(a, power);
+          child.angle -= dt * 1 * pi;
+          child.position += Vector2(-40, 100 * sin(1 * child.angle));
 
-        //print(child.toString());
+          //print(child.toString());
+        }
       }
     }
+
     //children.firstWhere((value) => );
   }
 }
 
 Sprite cardGameSprite(double x, double y, double width, double height) {
   return Sprite(
-    Flame.images.fromCache('20.png'),
+    Flame.images.fromCache('aeromancer_spritesheet.png'),
     srcPosition: Vector2(x, y),
     srcSize: Vector2(width, height),
   );

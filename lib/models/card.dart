@@ -7,8 +7,7 @@ import 'package:flame/experimental.dart';
 
 class Card extends PositionComponent with DragCallbacks {
   String name, description, type;
-  int id, cost, power;
-  String? imageAssetPath;
+  int id, cost, power, imageNumber;
 
   bool _faceUp = false;
   double frame;
@@ -27,7 +26,7 @@ class Card extends PositionComponent with DragCallbacks {
     required this.id,
     this.cost = 0,
     this.power = 0,
-    this.imageAssetPath,
+    this.imageNumber = 19,
     this.frame = 0,
   }) : super(size: CardGame.cardSize);
 
@@ -87,10 +86,20 @@ class Card extends PositionComponent with DragCallbacks {
       cardRRect,
       blackBorderPaint,
     );
-    flameSprite.render(canvas,
-        position: Vector2(size.x / 2, size.y * (0.38)),
-        anchor: Anchor.center,
-        size: flameSprite.srcSize.scaled(1.88));
+    switch (imageNumber) {
+      case 19:
+        iceCannonSprite.render(canvas,
+            position: Vector2(size.x / 2, size.y * (0.38)),
+            anchor: Anchor.center,
+            size: iceCannonSprite.srcSize.scaled(3.765));
+        break;
+      default:
+        iceCannonSprite.render(canvas,
+            position: Vector2(size.x / 2, size.y * (0.38)),
+            anchor: Anchor.center,
+            size: iceCannonSprite.srcSize.scaled(3.765));
+        break;
+    }
   }
 
   static final Paint backBackgroundPaint = Paint()
@@ -108,7 +117,8 @@ class Card extends PositionComponent with DragCallbacks {
     const Radius.circular(CardGame.cardRadius),
   );
   static final RRect backRRectInner = cardRRect.deflate(40);
-  static late final Sprite flameSprite = cardGameSprite(0, 0, 512, 384);
+  static late final Sprite iceCannonSprite =
+      cardGameSprite(19 * 256, 0, 256, 192);
 
   void _renderBack(Canvas canvas) {
     canvas.rotate(frame * 2 * pi);
