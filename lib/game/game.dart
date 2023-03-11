@@ -7,6 +7,7 @@ import 'package:flame/experimental.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/animation.dart';
+import 'package:flutter/material.dart' hide Card;
 
 import '../models/card.dart';
 
@@ -25,14 +26,43 @@ class CardGame extends FlameGame
   bool animated = true;
   double dealSpeed = 2;
   double dealInterval = 0.25;
+  double turnStartDelay = 2;
 
   @override
   Color backgroundColor() => const Color(0x00000000);
+
+  //Timer stuff starts here.
+
+  static const String description = '''
+    This example shows how to use the `Timer`.\n\n
+    Tap down to start the countdown timer, it will then count to 5 and then stop
+    until you tap the canvas again and it restarts.
+  ''';
+
+  final TextPaint textConfig = TextPaint(
+    style: const TextStyle(color: Colors.white, fontSize: 20),
+  );
+  late Timer countdown;
+  late Timer interval;
+
+  int elapsedSecs = 0;
+
+  //Timer stuff ends here.
 
   @override
   Future<void> onLoad() async {
     await Flame.images.load('aeromancer_spritesheet.png');
     camera.viewport = FixedResolutionViewport(Vector2(1920, 1080));
+
+    countdown = Timer(5);
+    interval = Timer(
+      1,
+      onTick: () {
+        elapsedSecs += 1;
+      },
+      repeat: true,
+    );
+    interval.start();
 
     /* add(
       Player()
@@ -41,10 +71,6 @@ class CardGame extends FlameGame
         ..height = 100
         ..anchor = Anchor.center,
     ); */
-
-
-
-
 
     /* final random = Random();
     for (var i = 0; i < 7; i++) {
@@ -59,11 +85,11 @@ class CardGame extends FlameGame
       }
     } */
 
-
     Card myCard = Card(id: 1000, description: "Ice Cannon")
       ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
       ..anchor = Anchor.center;
     myCard.position = Vector2(size.x - 200, 850);
+    myCard.canBeMoved = false;
     print(myCard.size);
     print(myCard.anchor.toVector2());
     myCard.flip();
@@ -110,6 +136,7 @@ class CardGame extends FlameGame
           ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
           ..anchor = Anchor.center;
     mySecondCard.position = Vector2(size.x - 200, 850);
+    mySecondCard.canBeMoved = false;
     mySecondCard.flip();
     mySecondCard.priority = 1;
 
@@ -157,28 +184,21 @@ class CardGame extends FlameGame
     add(myCard);
     add(mySecondCard);
 
-    /* world.add(SpriteComponent(
-        sprite: Sprite(
-      Flame.images.fromCache('20.png'),
-      srcPosition: Vector2(300, 300),
-      srcSize: Vector2(512, 512),
-    ))); */
-
-    /* add(
-      SpriteComponent(
-        sprite: sprite,
-        position: size / 2,
-        size: sprite.srcSize / 2,
-        anchor: Anchor.center,
-      ),
-    ); */
-
-    //children.register<Card>();
+    //await Future.delayed(const Duration(milliseconds: 4000));
   }
 
   @override
   void update(double dt) {
     super.update(dt);
+    countdown.update(dt);
+    interval.update(dt);
+    if (elapsedSecs >= turnStartDelay) {
+      for (final child in children) {
+        if (child is Card) {
+          child.canBeMoved = true;
+        }
+      }
+    }
 
     /* if (animated) {
       var a = 1 * dt;
@@ -199,6 +219,17 @@ class CardGame extends FlameGame
     } */
 
     //children.firstWhere((value) => );
+  }
+
+  @override
+  void render(Canvas canvas) {
+    super.render(canvas);
+    textConfig.render(
+      canvas,
+      'Countdown: ${countdown.current.toStringAsPrecision(3)}',
+      Vector2(30, 100),
+    );
+    textConfig.render(canvas, 'Elapsed time: $elapsedSecs', Vector2(30, 130));
   }
 }
 
