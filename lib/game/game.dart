@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 
@@ -32,8 +33,8 @@ class CardGame extends FlameGame
   double dealInterval = 0.1;
   double turnStartDelayMS = 150;
 
-  @override
-  Color backgroundColor() => const Color(0x00000000);
+  /*  @override
+  Color backgroundColor() => const Color(0x00000000); */
 
   //Timer stuff starts here.
 
@@ -70,13 +71,13 @@ class CardGame extends FlameGame
 
     //add(ScreenHitbox());
 
-    add(
+    /* add(
       Player()
         ..position = size / 2
         ..width = 50
         ..height = 100
         ..anchor = Anchor.center,
-    );
+    ); */
 
     /* final random = Random();
     for (var i = 0; i < 7; i++) {
@@ -91,7 +92,10 @@ class CardGame extends FlameGame
       }
     } */
 
-    Card myCard = Card(id: 1000, description: "Ice Cannon", dragStartingPosition: Vector2(300, 850))
+    Card myCard = Card(
+        id: 1000,
+        description: "Ice Cannon",
+        dragStartingPosition: Vector2(300, 850))
       ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
       ..anchor = Anchor.center;
     myCard.position = Vector2(size.x - 200, 850);
@@ -137,10 +141,13 @@ class CardGame extends FlameGame
           curve: Curves.ease,
         )));
 
-    Card mySecondCard =
-        Card(id: 1000, description: "Warp Time", imageNumber: 29, dragStartingPosition: Vector2(700, 850))
-          ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
-          ..anchor = Anchor.center;
+    Card mySecondCard = Card(
+        id: 1000,
+        description: "Warp Time",
+        imageNumber: 29,
+        dragStartingPosition: Vector2(700, 850))
+      ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
+      ..anchor = Anchor.center;
     mySecondCard.position = Vector2(size.x - 200, 850);
     mySecondCard.canBeMoved = false;
     mySecondCard.flip();
@@ -189,6 +196,9 @@ class CardGame extends FlameGame
 
     add(myCard);
     add(mySecondCard);
+    add(PlayCardArea()
+      ..width = size.x
+      ..height = size.y / 3.5);
 
     //await Future.delayed(const Duration(milliseconds: 4000));
   }
@@ -205,26 +215,6 @@ class CardGame extends FlameGame
         }
       }
     }
-
-    /* if (animated) {
-      var a = 1 * dt;
-      for (final child in children) {
-        if (child is Card) {
-          if (child.scale.length < 1) {
-            child.scale += Vector2(0.0065, 0.0065);
-          }
-          //var a = 500 * dt;
-          //double power = -0.01*pow(a, 2).toDouble();
-          //child.position += Vector2(a, power);
-          child.angle -= a * 1 * pi;
-          child.position += Vector2(-4, 3 * sin(40 * a * child.angle));
-
-          //print(child.toString());
-        }
-      }
-    } */
-
-    //children.firstWhere((value) => );
   }
 
   @override
@@ -253,4 +243,19 @@ Sprite cardGameSprite(double x, double y, double width, double height) {
     srcPosition: Vector2(x, y),
     srcSize: Vector2(width, height),
   );
+}
+
+class PlayCardArea extends PositionComponent with CollisionCallbacks {
+  static final _paint = Paint()..color = Colors.transparent;
+  @override
+  FutureOr<void> onLoad() {
+    // TODO: implement onLoad
+    add(RectangleHitbox(size: size, isSolid: true)..renderShape = false);
+    return super.onLoad();
+  }
+
+  /* @override
+  void render(Canvas canvas) {
+    canvas.drawRect(size.toRect(), _paint);
+  } */
 }

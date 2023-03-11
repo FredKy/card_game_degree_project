@@ -23,11 +23,12 @@ class Card extends PositionComponent
   String name, description, type;
   int id, cost, power, imageNumber;
 
-  TextComponent textComponent = TextComponent();
+  final TextComponent textComponent = TextComponent();
 
   bool canBeMoved = true;
   bool _isDragging = false;
   bool _faceUp = false;
+  bool _isInPlayCardArea = false;
   double frame;
   bool get isFaceUp => _faceUp;
   void flip() => _faceUp = !_faceUp;
@@ -67,31 +68,6 @@ class Card extends PositionComponent
       _renderBack(canvas);
     }
   }
-
-/*   void _drawSprite(
-    Canvas canvas,
-    Sprite sprite,
-    double relativeX,
-    double relativeY, {
-    double scale = 1,
-    bool rotate = false,
-  }) {
-    if (rotate) {
-      canvas.save();
-      canvas.translate(size.x / 2, size.y / 2);
-      canvas.rotate(pi);
-      canvas.translate(-size.x / 2, -size.y / 2);
-    }
-    sprite.render(
-      canvas,
-      position: Vector2(relativeX * size.x, relativeY * size.y),
-      anchor: Anchor.center,
-      size: sprite.srcSize.scaled(scale),
-    );
-    if (rotate) {
-      canvas.restore();
-    }
-  } */
 
   static final Paint frontBackgroundPaint = Paint()
     ..color = const Color.fromARGB(255, 104, 104, 104);
@@ -209,19 +185,44 @@ class Card extends PositionComponent
     if (!_isDragging) {
       return;
     }
-    _isDragging = false;
-    canBeMoved = false;
-    add(MoveEffect.to(
-      dragStartingPosition,
-      EffectController(
-        duration: 0.2,
-        curve: Curves.easeOut,
-      ),
-    ));
-    await Future.delayed(const Duration(milliseconds: 250));
-    //dragStartingPosition = Vector2(0, 0);
-    priority = startingPriority;
-    canBeMoved = true;
+    if (_isInPlayCardArea) {
+      _isDragging = false;
+      canBeMoved = false;
+      double duration = 3;
+      add(ScaleEffect.to(
+          Vector2.all(0.3),
+          EffectController(
+            duration: duration,
+            //reverseDuration: 0.15,
+            curve: Curves.ease,
+          )));
+      add(RotateEffect.by(
+        (3 / 4) * pi,
+        EffectController(
+          duration: duration,
+          //reverseDuration: 0.15,
+          curve: Curves.ease,
+          //infinite: true,
+        ),
+      ));
+      await Future.delayed(
+          Duration(milliseconds: (duration * 100 + 1).toInt()));
+      destroy();
+    } else {
+      _isDragging = false;
+      canBeMoved = false;
+      add(MoveEffect.to(
+        dragStartingPosition,
+        EffectController(
+          duration: 0.2,
+          curve: Curves.easeOut,
+        ),
+      ));
+      await Future.delayed(const Duration(milliseconds: 201));
+      //dragStartingPosition = Vector2(0, 0);
+      priority = startingPriority;
+      canBeMoved = true;
+    }
   }
 
   //Collision
@@ -235,8 +236,9 @@ class Card extends PositionComponent
     } else if (other is Player) {
       blackBorderPaint.color = _collisionColor;
     } */
-    if (other is Player) {
+    if (other is Player || other is PlayCardArea) {
       frontBorderPaint.color = _collisionColor;
+      _isInPlayCardArea = true;
     }
   }
 
@@ -244,10 +246,55 @@ class Card extends PositionComponent
   void onCollisionEnd(PositionComponent other) {
     super.onCollisionEnd(other);
     frontBorderPaint.color = _defaultBorderColor;
+    _isInPlayCardArea = false;
     /* if (other is ScreenHitbox) {
       //...
     } else if (other is Player) {
       hitbox.paint.color = _defaultColor;
     } */
+  }
+
+  void destroy() {
+    /* final particleComponent = ParticleSystemComponent(
+        particle: Particle.generate(
+            count: 10,
+            lifespan: 1.5,
+            generator: (i) => AcceleratedParticle(
+                  acceleration: utils.getRandomVector(300),
+                  speed: utils.getRandomVector(100),
+                  position: (Vector2(0, size[1] * 0.3) + position.clone()),
+                  child: ComputedParticle(
+                    renderer: (canvas, particle) {
+                      // Override the color to dynamically update opacity
+                      paint.color = utils.getRandomColor().withOpacity(
+                          utils.fourth(particle.progress, 1.5) as double);
+
+                      canvas.drawCircle(
+                        Offset.zero,
+                        // Closer to the end of lifespan particles
+                        // will turn into larger glaring circles
+                        Random().nextDouble() * particle.progress > .4
+                            ? (particle.progress > 0.7
+                                ? Random().nextDouble() *
+                                    (10 * particle.progress)
+                                : Random().nextDouble() *
+                                    (3 * particle.progress))
+                            : 1 + (30 * particle.progress),
+                        paint,
+                      );
+                    },
+                  ),
+                )));
+    gameRef.add(particleComponent); */
+
+    removeFromParent();
+
+    //gameRef.player.score += 100;
+    /* final command = Command<Player>(action: ((player) {
+      player.addToScore(100);
+    }));
+    gameRef.addCommand(command); */
+
+    return;
   }
 }
