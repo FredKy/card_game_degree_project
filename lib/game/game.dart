@@ -2,9 +2,11 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
+import 'package:flutter/animation.dart';
 
 import '../models/card.dart';
 
@@ -20,7 +22,12 @@ class CardGame extends FlameGame
     const Radius.circular(cardRadius),
   );
 
-  bool animated = false;
+  bool animated = true;
+  double dealSpeed = 2;
+  double dealInterval = 0.5;
+
+  @override
+  Color backgroundColor() => const Color(0x00000000);
 
   @override
   Future<void> onLoad() async {
@@ -63,16 +70,97 @@ class CardGame extends FlameGame
     add(camera); */
     Card myCard = Card(id: 1000, description: "Ice Cannon")
       ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
-      ..anchor = Anchor.center
-      ..position = Vector2(800, 850);
+      ..anchor = Anchor.center;
+    myCard.position = Vector2(size.x - 200, 850);
+    print(myCard.size);
+    print(myCard.anchor.toVector2());
     myCard.flip();
+    myCard.priority = 2;
+    myCard.add(
+      MoveEffect.to(
+        Vector2(300, 850),
+        EffectController(
+          duration: dealSpeed * 2,
+          reverseDuration: dealSpeed * 2,
+          //infinite: true,
+          curve: Curves.easeOutCirc,
+        ),
+      ),
+    );
+    myCard.add(MoveByEffect(
+        Vector2(0, -300),
+        EffectController(
+            duration: dealSpeed * 0.4,
+            reverseDuration: dealSpeed * 0.4,
+            //infinite: true,
+            curve: Curves.ease)));
+    myCard.add(
+      RotateEffect.by(
+        -4.0 * pi,
+        EffectController(
+          duration: dealSpeed * 0.3 * 2,
+          //reverseDuration: 0.15,
+          curve: Curves.ease,
+          //infinite: true,
+        ),
+      ),
+    );
+    myCard.add(ScaleEffect.to(
+        Vector2.all(1),
+        EffectController(
+          duration: dealSpeed * 0.3 * 2,
+          //reverseDuration: 0.15,
+          curve: Curves.ease,
+        )));
 
     Card mySecondCard =
         Card(id: 1000, description: "Warp Time", imageNumber: 29)
           ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
-          ..anchor = Anchor.center
-          ..position = Vector2(1200, 850);
+          ..anchor = Anchor.center;
+    mySecondCard.position = Vector2(size.x - 200, 850);
     mySecondCard.flip();
+    mySecondCard.priority = 1;
+
+    mySecondCard.add(
+      MoveEffect.to(
+        Vector2(700, 850),
+        EffectController(
+          startDelay: dealInterval,
+          duration: dealSpeed * 2,
+          reverseDuration: dealSpeed * 2,
+          //infinite: true,
+          curve: Curves.easeOutCirc,
+        ),
+      ),
+    );
+    mySecondCard.add(MoveByEffect(
+        Vector2(0, -300),
+        EffectController(
+            startDelay: dealInterval,
+            duration: dealSpeed * 0.4,
+            reverseDuration: dealSpeed * 0.4,
+            //infinite: true,
+            curve: Curves.ease)));
+    mySecondCard.add(
+      RotateEffect.by(
+        -4 * pi,
+        EffectController(
+          startDelay: dealInterval,
+          duration: dealSpeed * 0.3 * 2,
+          //reverseDuration: 0.15,
+          curve: Curves.ease,
+          //infinite: true,
+        ),
+      ),
+    );
+    mySecondCard.add(ScaleEffect.to(
+        Vector2.all(1),
+        EffectController(
+          startDelay: dealInterval,
+          duration: dealSpeed * 0.3 * 2,
+          //reverseDuration: 0.15,
+          curve: Curves.ease,
+        )));
 
     add(myCard);
     add(mySecondCard);
@@ -100,22 +188,23 @@ class CardGame extends FlameGame
   void update(double dt) {
     super.update(dt);
 
-    if (animated) {
+    /* if (animated) {
+      var a = 1 * dt;
       for (final child in children) {
         if (child is Card) {
           if (child.scale.length < 1) {
-            child.scale += Vector2(0.01, 0.01);
+            child.scale += Vector2(0.0065, 0.0065);
           }
-          var a = 500 * dt;
+          //var a = 500 * dt;
           //double power = -0.01*pow(a, 2).toDouble();
           //child.position += Vector2(a, power);
-          child.angle -= dt * 1 * pi;
-          child.position += Vector2(-40, 100 * sin(1 * child.angle));
+          child.angle -= a * 1 * pi;
+          child.position += Vector2(-4, 3 * sin(40 * a * child.angle));
 
           //print(child.toString());
         }
       }
-    }
+    } */
 
     //children.firstWhere((value) => );
   }
