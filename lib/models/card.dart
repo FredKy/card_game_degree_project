@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:math';
 //import 'dart:ui' hide TextStyle;
+import 'package:card_game_degree_project/game/player.dart';
+import 'package:flame/collisions.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/animation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 
 import 'package:card_game_degree_project/game/game.dart';
@@ -15,7 +18,8 @@ const style = TextStyle(
     fontFamily: 'Yoster');
 final regular = TextPaint(style: style);
 
-class Card extends PositionComponent with DragCallbacks {
+class Card extends PositionComponent
+    with DragCallbacks, CollisionCallbacks /* HasGameReference<CardGame> */ {
   String name, description, type;
   int id, cost, power, imageNumber;
 
@@ -32,8 +36,13 @@ class Card extends PositionComponent with DragCallbacks {
     frame = dt;
   }
 
-  Vector2 dragStartingPosition = Vector2(0, 0);
+  final Vector2 dragStartingPosition;
   late int startingPriority;
+
+  final _collisionColor = Colors.amber;
+  final _defaultColor = Colors.cyan;
+  final _defaultBorderColor = const Color.fromARGB(255, 68, 68, 68);
+  late ShapeHitbox hitbox;
 
   Card({
     this.name = "",
@@ -44,6 +53,7 @@ class Card extends PositionComponent with DragCallbacks {
     this.power = 0,
     this.imageNumber = 19,
     this.frame = 0,
+    required this.dragStartingPosition,
   }) : super(size: CardGame.cardSize);
 
   @override
@@ -58,7 +68,7 @@ class Card extends PositionComponent with DragCallbacks {
     }
   }
 
-  void _drawSprite(
+/*   void _drawSprite(
     Canvas canvas,
     Sprite sprite,
     double relativeX,
@@ -81,7 +91,7 @@ class Card extends PositionComponent with DragCallbacks {
     if (rotate) {
       canvas.restore();
     }
-  }
+  } */
 
   static final Paint frontBackgroundPaint = Paint()
     ..color = const Color.fromARGB(255, 104, 104, 104);
@@ -89,7 +99,7 @@ class Card extends PositionComponent with DragCallbacks {
     ..color = const Color(0xffece8a3)
     ..style = PaintingStyle.stroke
     ..strokeWidth = 7;
-  static final Paint blackBorderPaint = Paint()
+  final Paint frontBorderPaint = Paint()
     ..color = const Color.fromARGB(255, 68, 68, 68)
     ..style = PaintingStyle.stroke
     ..strokeWidth = 12;
@@ -103,7 +113,7 @@ class Card extends PositionComponent with DragCallbacks {
     canvas.drawRRect(cardRRect, frontBackgroundPaint);
     canvas.drawRRect(
       cardRRect,
-      blackBorderPaint,
+      frontBorderPaint,
     );
     switch (imageNumber) {
       case 19:
@@ -158,6 +168,16 @@ class Card extends PositionComponent with DragCallbacks {
       ..anchor = Anchor.center
       ..position = Vector2(size.x / 2, 25);
     add(textComponent);
+
+    final defaultPaint = Paint()
+      ..color = _defaultColor
+      ..style = PaintingStyle.stroke;
+
+    final hitbox = RectangleHitbox(size: size, isSolid: true)
+      ..paint = defaultPaint
+      //..renderShape = true;
+      ..renderShape = false;
+    add(hitbox);
   }
 
   @override
@@ -170,7 +190,6 @@ class Card extends PositionComponent with DragCallbacks {
     if (canBeMoved) {
       _isDragging = true;
       priority = 100;
-      dragStartingPosition.add(position);
     }
   }
 
@@ -199,9 +218,36 @@ class Card extends PositionComponent with DragCallbacks {
         curve: Curves.easeOut,
       ),
     ));
-    await Future.delayed(const Duration(milliseconds: 200));
-    dragStartingPosition = Vector2(0, 0);
+    await Future.delayed(const Duration(milliseconds: 250));
+    //dragStartingPosition = Vector2(0, 0);
     priority = startingPriority;
     canBeMoved = true;
+  }
+
+  //Collision
+
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollisionStart(intersectionPoints, other);
+    //blackBorderPaint.color = _defaultBorderColor;
+    /* if (other is ScreenHitbox) {
+      //...
+    } else if (other is Player) {
+      blackBorderPaint.color = _collisionColor;
+    } */
+    if (other is Player) {
+      frontBorderPaint.color = _collisionColor;
+    }
+  }
+
+  @override
+  void onCollisionEnd(PositionComponent other) {
+    super.onCollisionEnd(other);
+    frontBorderPaint.color = _defaultBorderColor;
+    /* if (other is ScreenHitbox) {
+      //...
+    } else if (other is Player) {
+      hitbox.paint.color = _defaultColor;
+    } */
   }
 }

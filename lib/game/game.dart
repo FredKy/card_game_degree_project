@@ -1,18 +1,22 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:card_game_degree_project/game/player.dart';
+import 'package:card_game_degree_project/models/my_collidable.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
+import 'package:flame/input.dart';
 import 'package:flutter/animation.dart';
-import 'package:flutter/material.dart' hide Card;
+import 'package:flutter/material.dart' hide Card, Image, Draggable;
+import 'package:flame/collisions.dart';
 
 import '../models/card.dart';
 
 class CardGame extends FlameGame
-    with HasTappableComponents, HasDraggableComponents {
+    with HasTappableComponents, HasDraggableComponents, HasCollisionDetection {
   static const double cardWidth = 300.0;
   static const double cardHeight = 420.0;
   static const double cardGap = 175.0;
@@ -24,9 +28,9 @@ class CardGame extends FlameGame
   );
 
   bool animated = true;
-  double dealSpeed = 2;
-  double dealInterval = 0.25;
-  double turnStartDelay = 2;
+  double dealSpeed = 1;
+  double dealInterval = 0.1;
+  double turnStartDelayMS = 150;
 
   @override
   Color backgroundColor() => const Color(0x00000000);
@@ -45,7 +49,7 @@ class CardGame extends FlameGame
   late Timer countdown;
   late Timer interval;
 
-  int elapsedSecs = 0;
+  int elapsedMilliseconds = 0;
 
   //Timer stuff ends here.
 
@@ -56,21 +60,23 @@ class CardGame extends FlameGame
 
     countdown = Timer(5);
     interval = Timer(
-      1,
+      0.01,
       onTick: () {
-        elapsedSecs += 1;
+        elapsedMilliseconds += 1;
       },
       repeat: true,
     );
     interval.start();
 
-    /* add(
+    //add(ScreenHitbox());
+
+    add(
       Player()
         ..position = size / 2
         ..width = 50
         ..height = 100
         ..anchor = Anchor.center,
-    ); */
+    );
 
     /* final random = Random();
     for (var i = 0; i < 7; i++) {
@@ -85,7 +91,7 @@ class CardGame extends FlameGame
       }
     } */
 
-    Card myCard = Card(id: 1000, description: "Ice Cannon")
+    Card myCard = Card(id: 1000, description: "Ice Cannon", dragStartingPosition: Vector2(300, 850))
       ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
       ..anchor = Anchor.center;
     myCard.position = Vector2(size.x - 200, 850);
@@ -116,7 +122,7 @@ class CardGame extends FlameGame
       RotateEffect.by(
         -4.0 * pi,
         EffectController(
-          duration: dealSpeed * 0.3 * 2,
+          duration: dealSpeed * 0.6,
           //reverseDuration: 0.15,
           curve: Curves.ease,
           //infinite: true,
@@ -126,13 +132,13 @@ class CardGame extends FlameGame
     myCard.add(ScaleEffect.to(
         Vector2.all(1),
         EffectController(
-          duration: dealSpeed * 0.3 * 2,
+          duration: dealSpeed * 0.6,
           //reverseDuration: 0.15,
           curve: Curves.ease,
         )));
 
     Card mySecondCard =
-        Card(id: 1000, description: "Warp Time", imageNumber: 29)
+        Card(id: 1000, description: "Warp Time", imageNumber: 29, dragStartingPosition: Vector2(700, 850))
           ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
           ..anchor = Anchor.center;
     mySecondCard.position = Vector2(size.x - 200, 850);
@@ -165,7 +171,7 @@ class CardGame extends FlameGame
         -4 * pi,
         EffectController(
           startDelay: dealInterval,
-          duration: dealSpeed * 0.3 * 2,
+          duration: dealSpeed * 0.6,
           //reverseDuration: 0.15,
           curve: Curves.ease,
           //infinite: true,
@@ -176,7 +182,7 @@ class CardGame extends FlameGame
         Vector2.all(1),
         EffectController(
           startDelay: dealInterval,
-          duration: dealSpeed * 0.3 * 2,
+          duration: dealSpeed * 0.6,
           //reverseDuration: 0.15,
           curve: Curves.ease,
         )));
@@ -192,7 +198,7 @@ class CardGame extends FlameGame
     super.update(dt);
     countdown.update(dt);
     interval.update(dt);
-    if (elapsedSecs >= turnStartDelay) {
+    if (elapsedMilliseconds >= turnStartDelayMS) {
       for (final child in children) {
         if (child is Card) {
           child.canBeMoved = true;
@@ -229,8 +235,16 @@ class CardGame extends FlameGame
       'Countdown: ${countdown.current.toStringAsPrecision(3)}',
       Vector2(30, 100),
     );
-    textConfig.render(canvas, 'Elapsed time: $elapsedSecs', Vector2(30, 130));
+    textConfig.render(canvas,
+        'Elapsed time in milliseconds: $elapsedMilliseconds', Vector2(30, 130));
   }
+
+  /* @override
+  void onTapDown(event) {
+    super.onTapDown(event);
+    //add(MyCollidable(event.eventPosition.game));
+    add(MyCollidable(Vector2(500, 500)));
+  } */
 }
 
 Sprite cardGameSprite(double x, double y, double width, double height) {
