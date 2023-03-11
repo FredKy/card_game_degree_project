@@ -4,9 +4,7 @@ import 'dart:math';
 import 'package:card_game_degree_project/game/player.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/effects.dart';
-import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 
 import 'package:card_game_degree_project/game/game.dart';
 import 'package:flame/components.dart';
@@ -19,7 +17,9 @@ const style = TextStyle(
 final regular = TextPaint(style: style);
 
 class Card extends PositionComponent
-    with DragCallbacks, CollisionCallbacks /* HasGameReference<CardGame> */ {
+    with
+        DragCallbacks,
+        CollisionCallbacks /* , HasPaint */ /* , HasGameReference<CardGame> */ {
   String name, description, type;
   int id, cost, power, imageNumber;
 
@@ -188,25 +188,37 @@ class Card extends PositionComponent
     if (_isInPlayCardArea) {
       _isDragging = false;
       canBeMoved = false;
-      double duration = 3;
+      double duration = 0.6;
       add(ScaleEffect.to(
           Vector2.all(0.3),
           EffectController(
             duration: duration,
-            //reverseDuration: 0.15,
             curve: Curves.ease,
           )));
       add(RotateEffect.by(
         (3 / 4) * pi,
         EffectController(
           duration: duration,
-          //reverseDuration: 0.15,
           curve: Curves.ease,
-          //infinite: true,
         ),
       ));
+      add(MoveEffect.to(
+        CardGame.deckPosition,
+        EffectController(
+          duration: 0.3,
+          curve: Curves.easeOut,
+        ),
+      ));
+      /* add(
+        OpacityEffect.fadeOut(
+          EffectController(
+            duration: 0.3,
+          ),
+        ),
+      ); */
+
       await Future.delayed(
-          Duration(milliseconds: (duration * 100 + 1).toInt()));
+          Duration(milliseconds: (duration * 1000 + 1).toInt()));
       destroy();
     } else {
       _isDragging = false;

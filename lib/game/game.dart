@@ -27,6 +27,7 @@ class CardGame extends FlameGame
     const Rect.fromLTWH(0, 0, cardWidth, cardHeight),
     const Radius.circular(cardRadius),
   );
+  static final Vector2 deckPosition = Vector2(1720, 850);
 
   bool animated = true;
   double dealSpeed = 1;
