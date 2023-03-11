@@ -9,7 +9,7 @@ import 'package:flame/experimental.dart';
 
 const style = TextStyle(
     color: Color.fromARGB(255, 231, 231, 231),
-    fontSize: 120,
+    fontSize: 40,
     fontFamily: 'Yoster');
 final regular = TextPaint(style: style);
 
@@ -82,11 +82,11 @@ class Card extends PositionComponent with DragCallbacks {
   static final Paint redBorderPaint = Paint()
     ..color = const Color(0xffece8a3)
     ..style = PaintingStyle.stroke
-    ..strokeWidth = 10;
+    ..strokeWidth = 7;
   static final Paint blackBorderPaint = Paint()
     ..color = const Color.fromARGB(255, 68, 68, 68)
     ..style = PaintingStyle.stroke
-    ..strokeWidth = 40;
+    ..strokeWidth = 12;
 
   static late final Sprite iceCannonSprite =
       cardGameSprite(19 * 256, 0, 256, 192);
@@ -104,13 +104,13 @@ class Card extends PositionComponent with DragCallbacks {
         iceCannonSprite.render(canvas,
             position: Vector2(size.x / 2, size.y * (0.38)),
             anchor: Anchor.center,
-            size: iceCannonSprite.srcSize.scaled(3.765));
+            size: iceCannonSprite.srcSize.scaled(1.125));
         break;
       default:
         warpTimeSprite.render(canvas,
             position: Vector2(size.x / 2, size.y * (0.38)),
             anchor: Anchor.center,
-            size: warpTimeSprite.srcSize.scaled(3.765));
+            size: warpTimeSprite.srcSize.scaled(1.125));
         break;
     }
   }
@@ -148,7 +148,7 @@ class Card extends PositionComponent with DragCallbacks {
       ..text = description
       ..textRenderer = regular
       ..anchor = Anchor.center
-      ..position = Vector2(size.x / 2, 90);
+      ..position = Vector2(size.x / 2, 25);
     add(textComponent);
   }
 }

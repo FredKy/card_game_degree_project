@@ -10,10 +10,10 @@ import '../models/card.dart';
 
 class CardGame extends FlameGame
     with HasTappableComponents, HasDraggableComponents {
-  static const double cardWidth = 1000.0;
-  static const double cardHeight = 1400.0;
+  static const double cardWidth = 300.0;
+  static const double cardHeight = 420.0;
   static const double cardGap = 175.0;
-  static const double cardRadius = 100.0;
+  static const double cardRadius = 40;
   static final Vector2 cardSize = Vector2(cardWidth, cardHeight);
   static final cardRRect = RRect.fromRectAndRadius(
     const Rect.fromLTWH(0, 0, cardWidth, cardHeight),
@@ -25,7 +25,7 @@ class CardGame extends FlameGame
   @override
   Future<void> onLoad() async {
     await Flame.images.load('aeromancer_spritesheet.png');
-    camera.viewport = FixedResolutionViewport(Vector2(6 * 1920, 6 * 1080));
+    camera.viewport = FixedResolutionViewport(Vector2(1920, 1080));
 
     /* add(
       Player()
@@ -64,14 +64,14 @@ class CardGame extends FlameGame
     Card myCard = Card(id: 1000, description: "Ice Cannon")
       ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
       ..anchor = Anchor.center
-      ..position = Vector2(100 + 5 * 1150, 100 + 2 * 1500);
+      ..position = Vector2(800, 850);
     myCard.flip();
 
     Card mySecondCard =
         Card(id: 1000, description: "Warp Time", imageNumber: 29)
           ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
           ..anchor = Anchor.center
-          ..position = Vector2(100 + 6 * 1150, 100 + 2 * 1500);
+          ..position = Vector2(1200, 850);
     mySecondCard.flip();
 
     add(myCard);
