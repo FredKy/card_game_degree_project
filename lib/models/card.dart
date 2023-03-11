@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:card_game_degree_project/game/player.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/effects.dart';
+import 'package:flame/particles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:card_game_degree_project/game/game.dart';
@@ -19,7 +20,8 @@ final regular = TextPaint(style: style);
 class Card extends PositionComponent
     with
         DragCallbacks,
-        CollisionCallbacks /* , HasPaint */ /* , HasGameReference<CardGame> */ {
+        CollisionCallbacks /* , HasPaint */,
+        HasGameReference<CardGame> {
   String name, description, type;
   int id, cost, power, imageNumber;
 
@@ -44,6 +46,10 @@ class Card extends PositionComponent
   final _defaultColor = Colors.cyan;
   final _defaultBorderColor = const Color.fromARGB(255, 68, 68, 68);
   late ShapeHitbox hitbox;
+
+  final Random _random = Random();
+  int gameTick = 0;
+  bool showParticleTrail = false;
 
   Card({
     this.name = "",
@@ -159,6 +165,27 @@ class Card extends PositionComponent
   @override
   void update(double dt) {
     super.update(dt);
+    gameTick += 1;
+    gameTick = gameTick % 3;
+
+    if (/* gameTick == 0 */ showParticleTrail) {
+      final particleComponent = ParticleSystemComponent(
+        particle: Particle.generate(
+            count: 10,
+            lifespan: 3,
+            generator: (i) => AcceleratedParticle(
+                acceleration: getRandomVector(),
+                speed: getRandomVector(),
+                position: (/* Vector2(0, size.x * 0.3) + */ position.clone()),
+                child: CircleParticle(
+                  radius: 5.5,
+                  paint: Paint()..color = getRandomColor(),
+                ))),
+      );
+      //CardGame.add(particleComponent);
+      //addToParent(particleComponent);
+      game.add(particleComponent);
+    }
   }
 
   @override
@@ -188,6 +215,7 @@ class Card extends PositionComponent
     if (_isInPlayCardArea) {
       _isDragging = false;
       canBeMoved = false;
+      showParticleTrail = true;
       double duration = 0.6;
       add(ScaleEffect.to(
           Vector2.all(0.3),
@@ -308,5 +336,26 @@ class Card extends PositionComponent
     gameRef.addCommand(command); */
 
     return;
+  }
+
+  Vector2 getRandomVector() {
+    return (Vector2.random(_random) - Vector2(0.5, -1)) * 100;
+  }
+
+  Color getRandomColor() {
+    T getRandomElement<T>(List<T> list) {
+      final random = new Random();
+      var i = random.nextInt(list.length);
+      return list[i];
+    }
+
+    var list = [
+      Color.fromRGBO(255, 217, 94, 1),
+      Color.fromRGBO(255, 217, 94, 1),
+      Color.fromARGB(255, 255, 158, 94),
+      Color.fromARGB(255, 255, 158, 94),
+      Color.fromARGB(255, 255, 113, 94),
+    ];
+    return getRandomElement(list);
   }
 }
