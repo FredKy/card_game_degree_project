@@ -30,19 +30,14 @@ class Card extends PositionComponent
 
   final TextComponent textComponent = TextComponent();
 
-  bool canBeMoved = true;
+  bool canBeMoved = false;
   bool _isDragging = false;
-  bool _faceUp = false;
+  bool _faceUp = true;
   bool _isInPlayCardArea = false;
-  double frame;
   bool get isFaceUp => _faceUp;
   void flip() => _faceUp = !_faceUp;
 
-  set setFrame(double dt) {
-    frame = dt;
-  }
-
-  final Vector2 dragStartingPosition;
+  Vector2? dragStartingPosition;
   late int startingPriority;
 
   final _collisionColor = Colors.amber;
@@ -61,9 +56,13 @@ class Card extends PositionComponent
     this.cost = 0,
     this.power = 0,
     this.imageNumber = 19,
-    this.frame = 0,
-    required this.dragStartingPosition,
+    this.dragStartingPosition,
   }) : super(size: CardGame.cardSize);
+
+  factory Card.create(CardName name) {
+    return _singletons[name] ??
+        Card(id: 0, dragStartingPosition: Vector2(0, 0));
+  }
 
   @override
   String toString() => "Test";
@@ -106,8 +105,14 @@ class Card extends PositionComponent
             anchor: Anchor.center,
             size: iceCannonSprite.srcSize.scaled(1.125));
         break;
-      default:
+      case 29:
         warpTimeSprite.render(canvas,
+            position: Vector2(size.x / 2, size.y * (0.38)),
+            anchor: Anchor.center,
+            size: warpTimeSprite.srcSize.scaled(1.125));
+        break;
+      default:
+        iceCannonSprite.render(canvas,
             position: Vector2(size.x / 2, size.y * (0.38)),
             anchor: Anchor.center,
             size: warpTimeSprite.srcSize.scaled(1.125));
@@ -132,7 +137,7 @@ class Card extends PositionComponent
   static final RRect backRRectInner = cardRRect.deflate(40);
 
   void _renderBack(Canvas canvas) {
-    canvas.rotate(frame * 2 * pi);
+    canvas.rotate(2 * pi);
     canvas.drawRRect(cardRRect, backBackgroundPaint);
     canvas.drawRRect(cardRRect, backBorderPaint1);
     canvas.drawRRect(backRRectInner, backBorderPaint2);
@@ -275,7 +280,7 @@ class Card extends PositionComponent
       _isDragging = false;
       canBeMoved = false;
       add(MoveEffect.to(
-        dragStartingPosition,
+        dragStartingPosition ?? Vector2(0, 0),
         EffectController(
           duration: 0.2,
           curve: Curves.easeOut,
@@ -311,6 +316,7 @@ class Card extends PositionComponent
     return;
   }
 
+  // Utilities
   Vector2 getRandomVectorLocal() {
     return (Vector2.random(_random) - Vector2(0.5, -1)) * 100;
   }
@@ -331,4 +337,18 @@ class Card extends PositionComponent
     ];
     return getRandomElement(list);
   }
+
+  //Cards for factory
+
+  static late final Map<CardName, Card> _singletons = {
+    CardName.icecannon: Card(id: 1, description: "Ice Cannon", imageNumber: 19)
+      ..anchor = Anchor.center,
+    CardName.warptime: Card(id: 2, description: "Warp Time", imageNumber: 29)
+      ..anchor = Anchor.center
+  };
+}
+
+enum CardName {
+  icecannon,
+  warptime,
 }

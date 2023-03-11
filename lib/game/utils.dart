@@ -33,3 +33,5 @@ num fourth(double x, double lifespan) {
     return pow((lifespan - (x - lifespan / parts)) / lifespan, 4);
   }
 }
+
+

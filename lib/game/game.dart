@@ -1,16 +1,11 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:ui';
 
-import 'package:card_game_degree_project/game/player.dart';
-import 'package:card_game_degree_project/models/my_collidable.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
-import 'package:flame/input.dart';
-import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart' hide Card, Image, Draggable;
 import 'package:flame/collisions.dart';
 
@@ -38,12 +33,6 @@ class CardGame extends FlameGame
   Color backgroundColor() => const Color(0x00000000); */
 
   //Timer stuff starts here.
-
-  static const String description = '''
-    This example shows how to use the `Timer`.\n\n
-    Tap down to start the countdown timer, it will then count to 5 and then stop
-    until you tap the canvas again and it restarts.
-  ''';
 
   final TextPaint textConfig = TextPaint(
     style: const TextStyle(color: Colors.white, fontSize: 20),
@@ -93,115 +82,29 @@ class CardGame extends FlameGame
       }
     } */
 
-    Card myCard = Card(
-        id: 1000,
-        description: "Ice Cannon",
-        dragStartingPosition: Vector2(300, 850))
-      ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
-      ..anchor = Anchor.center;
-    myCard.position = Vector2(size.x - 200, 850);
-    myCard.canBeMoved = false;
-    print(myCard.size);
-    print(myCard.anchor.toVector2());
-    myCard.flip();
+    Card myCard = Card.create(CardName.icecannon)
+      ..dragStartingPosition = Vector2(300, 850)
+      ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1);
+    myCard.position = deckPosition;
     myCard.priority = 2;
-    myCard.add(
-      MoveEffect.to(
-        Vector2(300, 850),
-        EffectController(
-          duration: dealSpeed * 2,
-          //reverseDuration: dealSpeed * 2,
-          //infinite: true,
-          curve: Curves.easeOutCirc,
-        ),
-      ),
-    );
-    myCard.add(MoveByEffect(
-        Vector2(0, -300),
-        EffectController(
-            duration: dealSpeed * 0.4,
-            reverseDuration: dealSpeed * 0.4,
-            //infinite: true,
-            curve: Curves.ease)));
-    myCard.add(
-      RotateEffect.by(
-        -4.0 * pi,
-        EffectController(
-          duration: dealSpeed * 0.6,
-          //reverseDuration: 0.15,
-          curve: Curves.ease,
-          //infinite: true,
-        ),
-      ),
-    );
-    myCard.add(ScaleEffect.to(
-        Vector2.all(1),
-        EffectController(
-          duration: dealSpeed * 0.6,
-          //reverseDuration: 0.15,
-          curve: Curves.ease,
-        )));
+    addDealEffects(
+        card: myCard, dealSpeed: dealSpeed, moveToPosition: Vector2(300, 850));
 
-    Card mySecondCard = Card(
-        id: 1000,
-        description: "Warp Time",
-        imageNumber: 29,
-        dragStartingPosition: Vector2(700, 850))
-      ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
-      ..anchor = Anchor.center;
-    mySecondCard.position = Vector2(size.x - 200, 850);
-    mySecondCard.canBeMoved = false;
-    mySecondCard.flip();
+    Card mySecondCard = Card.create(CardName.warptime)
+      ..dragStartingPosition = Vector2(700, 850)
+      ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1);
+    mySecondCard.position = deckPosition;
     mySecondCard.priority = 1;
-
-    mySecondCard.add(
-      MoveEffect.to(
-        Vector2(700, 850),
-        EffectController(
-          startDelay: dealInterval,
-          duration: dealSpeed * 2,
-          //reverseDuration: dealSpeed * 2,
-          //infinite: true,
-          curve: Curves.easeOutCirc,
-        ),
-      ),
-    );
-    mySecondCard.add(MoveByEffect(
-        Vector2(0, -300),
-        EffectController(
-            startDelay: dealInterval,
-            duration: dealSpeed * 0.4,
-            reverseDuration: dealSpeed * 0.4,
-            //infinite: true,
-            curve: Curves.ease)));
-    mySecondCard.add(
-      RotateEffect.by(
-        -4 * pi,
-        EffectController(
-          startDelay: dealInterval,
-          duration: dealSpeed * 0.6,
-          //reverseDuration: 0.15,
-          curve: Curves.ease,
-          //infinite: true,
-        ),
-      ),
-    );
-    mySecondCard.add(ScaleEffect.to(
-        Vector2.all(1),
-        EffectController(
-          startDelay: dealInterval,
-          duration: dealSpeed * 0.6,
-          //reverseDuration: 0.15,
-          curve: Curves.ease,
-        )));
+    addDealEffects(
+        card: mySecondCard,
+        dealSpeed: dealSpeed,
+        moveToPosition: Vector2(700, 850));
 
     add(myCard);
     add(mySecondCard);
     add(PlayCardArea()
       ..width = size.x
       ..height = size.y / 3.5);
-
-    //await Future.delayed(const Duration(milliseconds: 4000));
   }
 
   @override
@@ -236,6 +139,44 @@ class CardGame extends FlameGame
     //add(MyCollidable(event.eventPosition.game));
     add(MyCollidable(Vector2(500, 500)));
   } */
+}
+
+void addDealEffects(
+    {required Card card,
+    required double dealSpeed,
+    required Vector2 moveToPosition}) {
+  card.scale = Vector2(0, 0);
+  card.add(
+    MoveEffect.to(
+      moveToPosition,
+      EffectController(
+        duration: dealSpeed * 2,
+        curve: Curves.easeOutCirc,
+      ),
+    ),
+  );
+  card.add(MoveByEffect(
+      Vector2(0, -300),
+      EffectController(
+          duration: dealSpeed * 0.4,
+          reverseDuration: dealSpeed * 0.4,
+          curve: Curves.ease)));
+  card.add(
+    RotateEffect.by(
+      -4.0 * pi,
+      EffectController(
+        duration: dealSpeed * 0.6,
+        curve: Curves.ease,
+      ),
+    ),
+  );
+  card.add(ScaleEffect.to(
+      Vector2.all(1),
+      EffectController(
+        duration: dealSpeed * 0.6,
+        //reverseDuration: 0.15,
+        curve: Curves.ease,
+      )));
 }
 
 Sprite cardGameSprite(double x, double y, double width, double height) {
