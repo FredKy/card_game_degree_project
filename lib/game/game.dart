@@ -24,7 +24,7 @@ class CardGame extends FlameGame
 
   bool animated = true;
   double dealSpeed = 2;
-  double dealInterval = 0.5;
+  double dealInterval = 0.25;
 
   @override
   Color backgroundColor() => const Color(0x00000000);
@@ -42,12 +42,9 @@ class CardGame extends FlameGame
         ..anchor = Anchor.center,
     ); */
 
-    /* final world = World();
-    add(world);
 
-    Card myCard = Card(id: 1000)
-      ..position = Vector2(100 + 3 * 1150, 100 + 2 * 1500)
-      ..addToParent(world); */
+
+
 
     /* final random = Random();
     for (var i = 0; i < 7; i++) {
@@ -62,12 +59,7 @@ class CardGame extends FlameGame
       }
     } */
 
-    /* final camera = CameraComponent(world: world)
-      ..viewfinder.visibleGameSize =
-          Vector2(cardWidth * 7 + cardGap * 8, 4 * cardHeight + 3 * cardGap)
-      ..viewfinder.position = Vector2(cardWidth * 3.5 + cardGap * 4, 0)
-      ..viewfinder.anchor = Anchor.topCenter;
-    add(camera); */
+
     Card myCard = Card(id: 1000, description: "Ice Cannon")
       ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
       ..anchor = Anchor.center;
@@ -81,7 +73,7 @@ class CardGame extends FlameGame
         Vector2(300, 850),
         EffectController(
           duration: dealSpeed * 2,
-          reverseDuration: dealSpeed * 2,
+          //reverseDuration: dealSpeed * 2,
           //infinite: true,
           curve: Curves.easeOutCirc,
         ),
@@ -127,7 +119,7 @@ class CardGame extends FlameGame
         EffectController(
           startDelay: dealInterval,
           duration: dealSpeed * 2,
-          reverseDuration: dealSpeed * 2,
+          //reverseDuration: dealSpeed * 2,
           //infinite: true,
           curve: Curves.easeOutCirc,
         ),

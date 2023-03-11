@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 //import 'dart:ui' hide TextStyle;
+import 'package:flame/effects.dart';
+import 'package:flutter/animation.dart';
 import 'package:flutter/painting.dart';
 
 import 'package:card_game_degree_project/game/game.dart';
@@ -19,15 +21,19 @@ class Card extends PositionComponent with DragCallbacks {
 
   TextComponent textComponent = TextComponent();
 
+  bool canBeMoved = true;
+  bool _isDragging = false;
   bool _faceUp = false;
   double frame;
+  bool get isFaceUp => _faceUp;
+  void flip() => _faceUp = !_faceUp;
 
   set setFrame(double dt) {
     frame = dt;
   }
 
-  bool get isFaceUp => _faceUp;
-  void flip() => _faceUp = !_faceUp;
+  Vector2 dragStartingPosition = Vector2(0, 0);
+  late int startingPriority;
 
   Card({
     this.name = "",
@@ -144,11 +150,58 @@ class Card extends PositionComponent with DragCallbacks {
   FutureOr<void> onLoad() {
     super.onLoad();
 
+    startingPriority = priority;
+
     textComponent
       ..text = description
       ..textRenderer = regular
       ..anchor = Anchor.center
       ..position = Vector2(size.x / 2, 25);
     add(textComponent);
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+  }
+
+  @override
+  void onDragStart(DragStartEvent event) {
+    if (canBeMoved) {
+      _isDragging = true;
+      priority = 100;
+      dragStartingPosition.add(position);
+    }
+  }
+
+  @override
+  void onDragUpdate(DragUpdateEvent event) {
+    if (canBeMoved) {
+      if (!_isDragging) {
+        return;
+      }
+      final delta = event.delta;
+      position.add(delta);
+    }
+  }
+
+  @override
+  void onDragEnd(DragEndEvent event) async {
+    if (!_isDragging) {
+      return;
+    }
+    _isDragging = false;
+    canBeMoved = false;
+    add(MoveEffect.to(
+      dragStartingPosition,
+      EffectController(
+        duration: 0.2,
+        curve: Curves.easeOut,
+      ),
+    ));
+    await Future.delayed(const Duration(milliseconds: 200));
+    dragStartingPosition = Vector2(0, 0);
+    priority = startingPriority;
+    canBeMoved = true;
   }
 }
