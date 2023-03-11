@@ -11,6 +11,8 @@ import 'package:card_game_degree_project/game/game.dart';
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 
+import '../game/utils.dart' as utils;
+
 const style = TextStyle(
     color: Color.fromARGB(255, 231, 231, 231),
     fontSize: 40,
@@ -20,7 +22,8 @@ final regular = TextPaint(style: style);
 class Card extends PositionComponent
     with
         DragCallbacks,
-        CollisionCallbacks /* , HasPaint */,
+        CollisionCallbacks,
+        HasPaint,
         HasGameReference<CardGame> {
   String name, description, type;
   int id, cost, power, imageNumber;
@@ -174,16 +177,14 @@ class Card extends PositionComponent
             count: 10,
             lifespan: 3,
             generator: (i) => AcceleratedParticle(
-                acceleration: getRandomVector(),
-                speed: getRandomVector(),
+                acceleration: getRandomVectorLocal(),
+                speed: getRandomVectorLocal(),
                 position: (/* Vector2(0, size.x * 0.3) + */ position.clone()),
                 child: CircleParticle(
                   radius: 5.5,
                   paint: Paint()..color = getRandomColor(),
                 ))),
       );
-      //CardGame.add(particleComponent);
-      //addToParent(particleComponent);
       game.add(particleComponent);
     }
   }
@@ -216,6 +217,38 @@ class Card extends PositionComponent
       _isDragging = false;
       canBeMoved = false;
       showParticleTrail = true;
+      final particleComponent = ParticleSystemComponent(
+          particle: Particle.generate(
+              count: 30,
+              lifespan: 1.5,
+              generator: (i) => AcceleratedParticle(
+                    acceleration: utils.getRandomVector(300),
+                    speed: utils.getRandomVector(100),
+                    position:
+                        (/* Vector2(0, size[1] * 0.3) + */ position.clone()),
+                    child: ComputedParticle(
+                      renderer: (canvas, particle) {
+                        // Override the color to dynamically update opacity
+                        paint.color = utils.getRandomColor().withOpacity(
+                            utils.fourth(particle.progress, 1.5) as double);
+
+                        canvas.drawCircle(
+                          Offset.zero,
+                          // Closer to the end of lifespan particles
+                          // will turn into larger glaring circles
+                          Random().nextDouble() * particle.progress > .4
+                              ? (particle.progress > 0.7
+                                  ? Random().nextDouble() *
+                                      (10 * particle.progress)
+                                  : Random().nextDouble() *
+                                      (3 * particle.progress))
+                              : 1 + (30 * particle.progress),
+                          paint,
+                        );
+                      },
+                    ),
+                  )));
+      game.add(particleComponent);
       double duration = 0.6;
       add(ScaleEffect.to(
           Vector2.all(0.3),
@@ -338,7 +371,7 @@ class Card extends PositionComponent
     return;
   }
 
-  Vector2 getRandomVector() {
+  Vector2 getRandomVectorLocal() {
     return (Vector2.random(_random) - Vector2(0.5, -1)) * 100;
   }
 
