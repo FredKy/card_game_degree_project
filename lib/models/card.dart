@@ -51,7 +51,6 @@ class Card extends PositionComponent
   late ShapeHitbox hitbox;
 
   final Random _random = Random();
-  int gameTick = 0;
   bool showParticleTrail = false;
 
   Card({
@@ -168,10 +167,8 @@ class Card extends PositionComponent
   @override
   void update(double dt) {
     super.update(dt);
-    gameTick += 1;
-    gameTick = gameTick % 3;
 
-    if (/* gameTick == 0 */ showParticleTrail) {
+    if (showParticleTrail) {
       final particleComponent = ParticleSystemComponent(
         particle: Particle.generate(
             count: 10,
@@ -270,13 +267,6 @@ class Card extends PositionComponent
           curve: Curves.easeOut,
         ),
       ));
-      /* add(
-        OpacityEffect.fadeOut(
-          EffectController(
-            duration: 0.3,
-          ),
-        ),
-      ); */
 
       await Future.delayed(
           Duration(milliseconds: (duration * 1000 + 1).toInt()));
@@ -292,7 +282,6 @@ class Card extends PositionComponent
         ),
       ));
       await Future.delayed(const Duration(milliseconds: 201));
-      //dragStartingPosition = Vector2(0, 0);
       priority = startingPriority;
       canBeMoved = true;
     }
@@ -302,14 +291,9 @@ class Card extends PositionComponent
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollision(intersectionPoints, other);
     super.onCollisionStart(intersectionPoints, other);
-    //blackBorderPaint.color = _defaultBorderColor;
-    /* if (other is ScreenHitbox) {
-      //...
-    } else if (other is Player) {
-      blackBorderPaint.color = _collisionColor;
-    } */
-    if (other is Player || other is PlayCardArea) {
+    if (other is PlayCardArea) {
       frontBorderPaint.color = _collisionColor;
       _isInPlayCardArea = true;
     }
@@ -320,54 +304,10 @@ class Card extends PositionComponent
     super.onCollisionEnd(other);
     frontBorderPaint.color = _defaultBorderColor;
     _isInPlayCardArea = false;
-    /* if (other is ScreenHitbox) {
-      //...
-    } else if (other is Player) {
-      hitbox.paint.color = _defaultColor;
-    } */
   }
 
   void destroy() {
-    /* final particleComponent = ParticleSystemComponent(
-        particle: Particle.generate(
-            count: 10,
-            lifespan: 1.5,
-            generator: (i) => AcceleratedParticle(
-                  acceleration: utils.getRandomVector(300),
-                  speed: utils.getRandomVector(100),
-                  position: (Vector2(0, size[1] * 0.3) + position.clone()),
-                  child: ComputedParticle(
-                    renderer: (canvas, particle) {
-                      // Override the color to dynamically update opacity
-                      paint.color = utils.getRandomColor().withOpacity(
-                          utils.fourth(particle.progress, 1.5) as double);
-
-                      canvas.drawCircle(
-                        Offset.zero,
-                        // Closer to the end of lifespan particles
-                        // will turn into larger glaring circles
-                        Random().nextDouble() * particle.progress > .4
-                            ? (particle.progress > 0.7
-                                ? Random().nextDouble() *
-                                    (10 * particle.progress)
-                                : Random().nextDouble() *
-                                    (3 * particle.progress))
-                            : 1 + (30 * particle.progress),
-                        paint,
-                      );
-                    },
-                  ),
-                )));
-    gameRef.add(particleComponent); */
-
     removeFromParent();
-
-    //gameRef.player.score += 100;
-    /* final command = Command<Player>(action: ((player) {
-      player.addToScore(100);
-    }));
-    gameRef.addCommand(command); */
-
     return;
   }
 
@@ -377,17 +317,17 @@ class Card extends PositionComponent
 
   Color getRandomColor() {
     T getRandomElement<T>(List<T> list) {
-      final random = new Random();
+      final random = Random();
       var i = random.nextInt(list.length);
       return list[i];
     }
 
     var list = [
-      Color.fromRGBO(255, 217, 94, 1),
-      Color.fromRGBO(255, 217, 94, 1),
-      Color.fromARGB(255, 255, 158, 94),
-      Color.fromARGB(255, 255, 158, 94),
-      Color.fromARGB(255, 255, 113, 94),
+      const Color.fromRGBO(255, 217, 94, 1),
+      const Color.fromRGBO(255, 217, 94, 1),
+      const Color.fromARGB(255, 255, 158, 94),
+      const Color.fromARGB(255, 255, 158, 94),
+      const Color.fromARGB(255, 255, 113, 94),
     ];
     return getRandomElement(list);
   }
