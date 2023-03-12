@@ -17,14 +17,14 @@ class CardGame extends FlameGame
   static const double cardWidth = 300.0;
   static const double cardHeight = 420.0;
   static const double cardGap = 175.0;
-  static const double cardRadius = 40;
+  static const double cardRadius = 30;
   static final Vector2 cardSize = Vector2(cardWidth, cardHeight);
   static final cardRRect = RRect.fromRectAndRadius(
     const Rect.fromLTWH(0, 0, cardWidth, cardHeight),
     const Radius.circular(cardRadius),
   );
   static final Vector2 deckPosition = Vector2(1820, 850);
-  static final Vector2 discardPilePosition = Vector2(100, 850);
+  static final Vector2 discardPilePosition = Vector2(65, 850);
   List<CardName> deckCards = [
     CardName.icecannon,
     CardName.coldtouch,
@@ -125,7 +125,7 @@ class CardGame extends FlameGame
         padding = 200 + 160 * (5 - cardsToDeal.length);
       } */
       var padding =
-          (cardsToDeal.length > 5) ? 360 : 360 + 160 * (5 - cardsToDeal.length);
+          (cardsToDeal.length > 5) ? 320 : 320 + 100 * (5 - cardsToDeal.length);
       var space = (size.x - 2 * padding) / (cardsToDeal.length - 1);
       for (var i = 0; i < cardsToDeal.length; i++) {
         //var tempCard;

@@ -15,9 +15,14 @@ import '../game/utils.dart' as utils;
 
 const style = TextStyle(
     color: Color.fromARGB(255, 231, 231, 231),
-    fontSize: 40,
+    fontSize: 30,
     fontFamily: 'Yoster');
 final regular = TextPaint(style: style);
+final costTextPaint = TextPaint(
+    style: const TextStyle(
+        color: Color.fromARGB(255, 46, 46, 46),
+        fontSize: 50,
+        fontFamily: 'Yoster'));
 
 class Card extends PositionComponent
     with
@@ -28,7 +33,11 @@ class Card extends PositionComponent
   String name, description, type;
   int id, cost, power, imageNumber;
 
-  final TextComponent textComponent = TextComponent();
+  /* @override
+  bool debugMode = true; */
+
+  final TextComponent cardNameText = TextComponent();
+  late final CostField costField;
 
   bool canBeMoved = false;
   bool _isDragging = false;
@@ -62,11 +71,11 @@ class Card extends PositionComponent
   factory Card.create(CardName name) {
     switch (name) {
       case CardName.icecannon:
-        return Card(id: 1, description: "Ice Cannon", imageNumber: 19);
+        return Card(id: 1, description: "Ice Cannon", imageNumber: 19, cost: 2);
       case CardName.warptime:
-        return Card(id: 2, description: "Warp Time", imageNumber: 29);
+        return Card(id: 2, description: "Warp Time", imageNumber: 29, cost: 3);
       case CardName.coldtouch:
-        return Card(id: 3, description: "Cold Touch", imageNumber: 38);
+        return Card(id: 3, description: "Cold Touch", imageNumber: 38, cost: 1);
       default:
         return Card(id: -1, dragStartingPosition: Vector2(0, 0));
     }
@@ -108,6 +117,7 @@ class Card extends PositionComponent
       cardRRect,
       frontBorderPaint,
     );
+
     var pos = Vector2(size.x / 2, size.y * (0.38));
     var scale = 1.125;
     switch (imageNumber) {
@@ -136,6 +146,7 @@ class Card extends PositionComponent
             size: warpTimeSprite.srcSize.scaled(scale));
         break;
     }
+    //canvas.drawRRect(cardCostRRect, costRectPaint);
   }
 
   static final Paint backBackgroundPaint = Paint()
@@ -170,12 +181,16 @@ class Card extends PositionComponent
     startingPriority = priority;
 
     if (_faceUp) {
-      textComponent
+      cardNameText
         ..text = description
         ..textRenderer = regular
         ..anchor = Anchor.center
         ..position = Vector2(size.x / 2, 25);
-      add(textComponent);
+
+      add(cardNameText);
+
+      costField = CostField(position: Vector2(15, 15), cost: cost.toString());
+      add(costField);
     }
 
     final defaultPaint = Paint()
@@ -364,17 +379,50 @@ class Card extends PositionComponent
               ))),
     );
   }
+}
 
-  /* //Cards for factory
+class CostField extends PositionComponent {
+  CostField({Paint? paint, Vector2? position, String? cost})
+      : _paint = paint ?? Paint()
+          ..color = const Color.fromARGB(255, 210, 138, 14)
+          ..style = PaintingStyle.fill,
+        _cost = cost ?? "0",
+        super(
+          position: position,
+          size: Vector2.all(60),
+          anchor: Anchor.center,
+        );
 
-  static late final Map<CardName, Card> _singletons = {
-    CardName.icecannon: Card(id: 1, description: "Ice Cannon", imageNumber: 19)
-      ..anchor = Anchor.center,
-    CardName.warptime: Card(id: 2, description: "Warp Time", imageNumber: 29)
-      ..anchor = Anchor.center,
-    CardName.coldtouch: Card(id: 3, description: "Cold Touch", imageNumber: 38)
+  final Paint _paint;
+  final String _cost;
+  final TextComponent _costText = TextComponent();
+
+  static final RRect cardCostRRect = RRect.fromRectAndCorners(
+    Vector2(52, 52).toRect(),
+    topLeft: const Radius.circular(15),
+    topRight: const Radius.circular(15),
+    bottomLeft: const Radius.circular(15),
+    bottomRight: const Radius.circular(15),
+  );
+
+  @override
+  FutureOr<void> onLoad() {
+    super.onLoad();
+    print(_cost);
+    _costText
+      ..text = _cost
+      ..textRenderer = costTextPaint
       ..anchor = Anchor.center
-  }; */
+      ..position = Vector2(25, 25);
+    add(_costText);
+  }
+
+  @override
+  void render(Canvas canvas) {
+    super.render(canvas);
+    //canvas.drawCircle(Offset(_radius, _radius), _radius, _paint);
+    canvas.drawRRect(cardCostRRect, _paint);
+  }
 }
 
 enum CardName {
