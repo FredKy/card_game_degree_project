@@ -41,7 +41,7 @@ class CardGame extends FlameGame
   bool animated = true;
   double dealSpeed = 1;
   double dealInterval = 0.1;
-  double turnStartDelayMS = 150;
+  int turnStartDelayMS = 150;
 
   /*  @override
   Color backgroundColor() => const Color(0x00000000); */
@@ -71,6 +71,13 @@ class CardGame extends FlameGame
       0.01,
       onTick: () {
         elapsedMilliseconds += 1;
+        if (elapsedMilliseconds == turnStartDelayMS) {
+          for (final child in children) {
+            if (child is Card) {
+              if (child.id != 0) child.canBeMoved = true;
+            }
+          }
+        }
       },
       repeat: true,
     );
@@ -155,25 +162,41 @@ class CardGame extends FlameGame
     for (final child in children) {
       if (child is Card) {
         //count += 1;
-        hand.add(child);
+        child.canBeMoved = false;
+        if (!child.hasBeenPlayed) hand.add(child);
       }
     }
-    var padding = (hand.length > 5) ? 320 : 320 + 100 * (5 - hand.length);
-    var space = (size.x - 2 * padding) / (hand.length - 1);
-    for (var i = 0; i < hand.length; i++) {
-      /* addDealEffects(
-          startDelay: i * dealInterval,
-          card: hand[i],
-          dealSpeed: dealSpeed,
-          moveToPosition: Vector2(padding + space * i, y)); */
-      hand[i].dragStartingPosition = Vector2(padding + space * i, y);
-      hand[i].add(MoveEffect.to(
-        Vector2(padding + space * i, y),
+    //Vector2(size.x / 2, y)
+    if (hand.length == 1) {
+      hand[0].dragStartingPosition = Vector2(size.x / 2, y);
+      hand[0].add(MoveEffect.to(
+        Vector2(size.x / 2, y),
         EffectController(
-          duration: dealSpeed * 2,
+          duration: dealSpeed,
           curve: Curves.easeOutCirc,
         ),
       ));
+    } else if (hand.length > 1) {
+      var padding = (hand.length > 5) ? 320 : 320 + 100 * (5 - hand.length);
+      var space = (size.x - 2 * padding) / (hand.length - 1);
+      for (var i = 0; i < hand.length; i++) {
+        hand[i].dragStartingPosition = Vector2(padding + space * i, y);
+        hand[i].add(MoveEffect.to(
+          Vector2(padding + space * i, y),
+          EffectController(
+            duration: dealSpeed,
+            curve: Curves.easeOutCirc,
+          ),
+        ));
+      }
+    }
+  }
+
+  void activateCards() {
+    for (final child in children) {
+      if (child is Card) {
+        child.canBeMoved = true;
+      }
     }
   }
 
@@ -182,13 +205,6 @@ class CardGame extends FlameGame
     super.update(dt);
     countdown.update(dt);
     interval.update(dt);
-    if (elapsedMilliseconds >= turnStartDelayMS) {
-      for (final child in children) {
-        if (child is Card) {
-          if (child.id != 0) child.canBeMoved = true;
-        }
-      }
-    }
   }
 
   @override

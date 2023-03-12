@@ -51,6 +51,7 @@ class Card extends PositionComponent
   bool _isDragging = false;
   bool _faceUp = true;
   bool _isInPlayCardArea = false;
+  bool hasBeenPlayed = false;
   bool get isFaceUp => _faceUp;
   void flip() => _faceUp = !_faceUp;
 
@@ -251,10 +252,18 @@ class Card extends PositionComponent
     if (_isInPlayCardArea) {
       _isDragging = false;
       canBeMoved = false;
+      hasBeenPlayed = true;
       //showParticleTrail = true;
       //game.add(getParticleComponent());
       double duration = 0.6;
       game.moveCards();
+      add(MoveEffect.to(
+        CardGame.discardPilePosition,
+        EffectController(
+          duration: duration / 2,
+          curve: Curves.easeOut,
+        ),
+      ));
       add(ScaleEffect.to(
           Vector2.all(0.3),
           EffectController(
@@ -274,19 +283,24 @@ class Card extends PositionComponent
           curve: Curves.ease,
         ),
       ));
+      /* 
+      Fixed bug by moving this moveEffect to the top of the effects.
+      The ending position in y-axis would be overshot if the duration parameter was set too low.
+      For instance 0.3 instead of 0.6
       add(MoveEffect.to(
         CardGame.discardPilePosition,
         EffectController(
-          duration: 0.3,
+          duration: duration / 2,
           curve: Curves.easeOut,
         ),
-      ));
+      )); */
 
       hitbox.collisionType = CollisionType.inactive;
       frontBorderPaint.color = _defaultBorderColor;
 
       await Future.delayed(
           Duration(milliseconds: (duration * 1000 + 1).toInt()));
+      game.activateCards();
       destroy();
     } else {
       _isDragging = false;
