@@ -60,7 +60,8 @@ class Card extends PositionComponent
   final _collisionColor = Colors.amber;
   final _defaultColor = Colors.cyan;
   final _defaultBorderColor = const Color.fromARGB(255, 68, 68, 68);
-  late ShapeHitbox hitbox;
+  final ShapeHitbox hitbox =
+      RectangleHitbox(size: CardGame.cardSize, isSolid: true);
 
   final Random _random = Random();
   bool showParticleTrail = false;
@@ -200,26 +201,16 @@ class Card extends PositionComponent
         ..anchor = Anchor.center
         ..position = Vector2(size.x / 2, 28);
       add(cardNameText);
-
-      /* cardDescriptionText
-        ..text = description
-        ..textRenderer = descriptionTextPaint
-        ..anchor = Anchor.center
-        ..position = Vector2(size.x / 2, 350);
-      add(cardDescriptionText); */
-
       add(DescriptionField(description: description));
       add(CostField(position: Vector2(15, 15), cost: cost.toString()));
     }
 
-    final defaultPaint = Paint()
+    /* final defaultPaint = Paint()
       ..color = _defaultColor
       ..style = PaintingStyle.stroke;
+    hitbox.paint = defaultPaint;
+    hitbox.renderShape = true; */
 
-    final hitbox = RectangleHitbox(size: size, isSolid: true)
-      ..paint = defaultPaint
-      //..renderShape = true;
-      ..renderShape = false;
     add(hitbox);
   }
 
@@ -289,6 +280,9 @@ class Card extends PositionComponent
           curve: Curves.easeOut,
         ),
       ));
+
+      hitbox.collisionType = CollisionType.inactive;
+      frontBorderPaint.color = _defaultBorderColor;
 
       await Future.delayed(
           Duration(milliseconds: (duration * 1000 + 1).toInt()));
