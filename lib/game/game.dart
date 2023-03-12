@@ -148,6 +148,35 @@ class CardGame extends FlameGame
     }
   }
 
+  void moveCards() {
+    double y = 850;
+    //var count = 0;
+    List<Card> hand = [];
+    for (final child in children) {
+      if (child is Card) {
+        //count += 1;
+        hand.add(child);
+      }
+    }
+    var padding = (hand.length > 5) ? 320 : 320 + 100 * (5 - hand.length);
+    var space = (size.x - 2 * padding) / (hand.length - 1);
+    for (var i = 0; i < hand.length; i++) {
+      /* addDealEffects(
+          startDelay: i * dealInterval,
+          card: hand[i],
+          dealSpeed: dealSpeed,
+          moveToPosition: Vector2(padding + space * i, y)); */
+      hand[i].dragStartingPosition = Vector2(padding + space * i, y);
+      hand[i].add(MoveEffect.to(
+        Vector2(padding + space * i, y),
+        EffectController(
+          duration: dealSpeed * 2,
+          curve: Curves.easeOutCirc,
+        ),
+      ));
+    }
+  }
+
   @override
   void update(double dt) {
     super.update(dt);

@@ -254,6 +254,7 @@ class Card extends PositionComponent
       //showParticleTrail = true;
       //game.add(getParticleComponent());
       double duration = 0.6;
+      game.moveCards();
       add(ScaleEffect.to(
           Vector2.all(0.3),
           EffectController(
