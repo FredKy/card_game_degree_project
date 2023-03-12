@@ -255,7 +255,7 @@ class Card extends PositionComponent
       hasBeenPlayed = true;
       //showParticleTrail = true;
       //game.add(getParticleComponent());
-      double duration = 0.6;
+      double duration = 0.4;
       game.moveCards();
       add(MoveEffect.to(
         CardGame.discardPilePosition,
