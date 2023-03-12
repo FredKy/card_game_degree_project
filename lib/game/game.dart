@@ -30,12 +30,12 @@ class CardGame extends FlameGame
     CardName.coldtouch,
     CardName.warptime,
     CardName.icecannon,
-    CardName.icecannon,
+    /* CardName.icecannon,
     CardName.coldtouch,
     CardName.warptime,
     CardName.icecannon,
     CardName.icecannon,
-    CardName.coldtouch,
+    CardName.coldtouch, */
   ];
   List<Card> hand = [];
   bool animated = true;
@@ -45,6 +45,9 @@ class CardGame extends FlameGame
 
   /*  @override
   Color backgroundColor() => const Color(0x00000000); */
+
+  /* @override
+  bool debugMode = true; */
 
   //Timer stuff starts here.
 

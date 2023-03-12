@@ -13,15 +13,20 @@ import 'package:flame/experimental.dart';
 
 import '../game/utils.dart' as utils;
 
-const style = TextStyle(
-    color: Color.fromARGB(255, 231, 231, 231),
-    fontSize: 30,
-    fontFamily: 'Yoster');
-final regular = TextPaint(style: style);
+final regular = TextPaint(
+    style: const TextStyle(
+        color: Color.fromARGB(255, 231, 231, 231),
+        fontSize: 30,
+        fontFamily: 'Yoster'));
 final costTextPaint = TextPaint(
     style: const TextStyle(
         color: Color.fromARGB(255, 46, 46, 46),
         fontSize: 50,
+        fontFamily: 'Yoster'));
+final descriptionTextPaint = TextPaint(
+    style: const TextStyle(
+        color: Color.fromARGB(255, 231, 231, 231),
+        fontSize: 25,
         fontFamily: 'Yoster'));
 
 class Card extends PositionComponent
@@ -37,7 +42,8 @@ class Card extends PositionComponent
   bool debugMode = true; */
 
   final TextComponent cardNameText = TextComponent();
-  late final CostField costField;
+  final TextComponent cardDescriptionText = TextComponent();
+  //late final CostField costField;
 
   bool canBeMoved = false;
   bool _isDragging = false;
@@ -59,7 +65,7 @@ class Card extends PositionComponent
 
   Card({
     this.name = "",
-    this.description = "",
+    this.description = "Here is where\nthe description\nshould be",
     this.type = "",
     required this.id,
     this.cost = 0,
@@ -71,13 +77,18 @@ class Card extends PositionComponent
   factory Card.create(CardName name) {
     switch (name) {
       case CardName.icecannon:
-        return Card(id: 1, description: "Ice Cannon", imageNumber: 19, cost: 2);
+        return Card(
+            id: 1,
+            name: "Ice Cannon",
+            description: "Deal 7 damage.",
+            imageNumber: 19,
+            cost: 2);
       case CardName.warptime:
-        return Card(id: 2, description: "Warp Time", imageNumber: 29, cost: 3);
+        return Card(id: 2, name: "Warp Time", imageNumber: 29, cost: 3);
       case CardName.coldtouch:
-        return Card(id: 3, description: "Cold Touch", imageNumber: 38, cost: 1);
+        return Card(id: 3, name: "Cold Touch", imageNumber: 38, cost: 1);
       default:
-        return Card(id: -1, dragStartingPosition: Vector2(0, 0));
+        return Card(id: 0, dragStartingPosition: Vector2(0, 0));
     }
   }
 
@@ -182,15 +193,21 @@ class Card extends PositionComponent
 
     if (_faceUp) {
       cardNameText
-        ..text = description
+        ..text = name
         ..textRenderer = regular
         ..anchor = Anchor.center
-        ..position = Vector2(size.x / 2, 25);
-
+        ..position = Vector2(size.x / 2, 28);
       add(cardNameText);
 
-      costField = CostField(position: Vector2(15, 15), cost: cost.toString());
-      add(costField);
+      /* cardDescriptionText
+        ..text = description
+        ..textRenderer = descriptionTextPaint
+        ..anchor = Anchor.center
+        ..position = Vector2(size.x / 2, 350);
+      add(cardDescriptionText); */
+
+      add(DescriptionField(description: description));
+      add(CostField(position: Vector2(15, 15), cost: cost.toString()));
     }
 
     final defaultPaint = Paint()
@@ -408,7 +425,6 @@ class CostField extends PositionComponent {
   @override
   FutureOr<void> onLoad() {
     super.onLoad();
-    print(_cost);
     _costText
       ..text = _cost
       ..textRenderer = costTextPaint
@@ -420,9 +436,45 @@ class CostField extends PositionComponent {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    //canvas.drawCircle(Offset(_radius, _radius), _radius, _paint);
     canvas.drawRRect(cardCostRRect, _paint);
   }
+}
+
+class DescriptionField extends PositionComponent {
+  DescriptionField({Paint? paint, Vector2? position, String? description})
+      : _paint = paint ?? Paint()
+          ..color = const Color.fromARGB(255, 210, 138, 14)
+          ..style = PaintingStyle.fill,
+        _description = description ?? "Description here.",
+        super(
+          position: Vector2(0, 270),
+          size: Vector2(300, 140),
+          anchor: Anchor.topLeft,
+        );
+
+  final Paint _paint;
+  final String _description;
+  final TextComponent _descriptionText = TextComponent();
+
+  static final RRect cardDescriptionRRect =
+      RRect.fromRectAndRadius(Vector2(300, 150).toRect(), Radius.zero);
+
+  @override
+  FutureOr<void> onLoad() {
+    super.onLoad();
+    _descriptionText
+      ..text = _description
+      ..textRenderer = descriptionTextPaint
+      ..anchor = Anchor.center
+      ..position = Vector2(size.x / 2, size.y / 2);
+    add(_descriptionText);
+  }
+
+  /* @override
+  void render(Canvas canvas) {
+    super.render(canvas);
+    canvas.drawRRect(cardDescriptionRRect, _paint);
+  } */
 }
 
 enum CardName {
