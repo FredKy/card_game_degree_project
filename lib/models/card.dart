@@ -267,6 +267,12 @@ class Card extends PositionComponent
             duration: duration,
             curve: Curves.ease,
           )));
+      add(MoveByEffect(
+          Vector2(0, -500),
+          EffectController(
+              duration: duration/2,
+              reverseDuration: duration/2,
+              curve: Curves.ease)));
       add(RotateEffect.by(
         -(8 / 4) * pi,
         EffectController(

@@ -100,7 +100,7 @@ class CardGame extends FlameGame
     } */
 
     dealCards(cardsToDeal: deckCards);
-    add(DiscardPile());
+    add(DiscardPile()..priority = 100);
     add(PlayCardArea()
       ..width = size.x
       ..height = size.y / 3.5);
