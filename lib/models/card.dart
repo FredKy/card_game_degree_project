@@ -60,8 +60,19 @@ class Card extends PositionComponent
   }) : super(size: CardGame.cardSize);
 
   factory Card.create(CardName name) {
-    return _singletons[name] ??
-        Card(id: 0, dragStartingPosition: Vector2(0, 0));
+    switch (name) {
+      case CardName.icecannon:
+        return Card(id: 1, description: "Ice Cannon", imageNumber: 19)
+          ..anchor = Anchor.center;
+      case CardName.warptime:
+        return Card(id: 2, description: "Warp Time", imageNumber: 29)
+          ..anchor = Anchor.center;
+      case CardName.coldtouch:
+        return Card(id: 3, description: "Cold Touch", imageNumber: 38)
+          ..anchor = Anchor.center;
+      default:
+        return Card(id: 0, dragStartingPosition: Vector2(0, 0));
+    }
   }
 
   @override
@@ -91,6 +102,8 @@ class Card extends PositionComponent
       cardGameSprite(19 * 256, 0, 256, 192);
   static late final Sprite warpTimeSprite =
       cardGameSprite(29 * 256, 64, 256, 192);
+  static late final Sprite coldTouchSprite =
+      cardGameSprite(38 * 256, 64, 256, 192);
 
   void _renderFront(Canvas canvas) {
     canvas.drawRRect(cardRRect, frontBackgroundPaint);
@@ -107,6 +120,12 @@ class Card extends PositionComponent
         break;
       case 29:
         warpTimeSprite.render(canvas,
+            position: Vector2(size.x / 2, size.y * (0.38)),
+            anchor: Anchor.center,
+            size: warpTimeSprite.srcSize.scaled(1.125));
+        break;
+      case 38:
+        coldTouchSprite.render(canvas,
             position: Vector2(size.x / 2, size.y * (0.38)),
             anchor: Anchor.center,
             size: warpTimeSprite.srcSize.scaled(1.125));
@@ -338,17 +357,20 @@ class Card extends PositionComponent
     return getRandomElement(list);
   }
 
-  //Cards for factory
+  /* //Cards for factory
 
   static late final Map<CardName, Card> _singletons = {
     CardName.icecannon: Card(id: 1, description: "Ice Cannon", imageNumber: 19)
       ..anchor = Anchor.center,
     CardName.warptime: Card(id: 2, description: "Warp Time", imageNumber: 29)
+      ..anchor = Anchor.center,
+    CardName.coldtouch: Card(id: 3, description: "Cold Touch", imageNumber: 38)
       ..anchor = Anchor.center
-  };
+  }; */
 }
 
 enum CardName {
   icecannon,
   warptime,
+  coldtouch,
 }

@@ -86,7 +86,7 @@ class CardGame extends FlameGame
       ..dragStartingPosition = Vector2(300, 850)
       ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1);
     myCard.position = deckPosition;
-    myCard.priority = 2;
+    myCard.priority = 3;
     addDealEffects(
         card: myCard, dealSpeed: dealSpeed, moveToPosition: Vector2(300, 850));
 
@@ -94,14 +94,25 @@ class CardGame extends FlameGame
       ..dragStartingPosition = Vector2(700, 850)
       ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1);
     mySecondCard.position = deckPosition;
-    mySecondCard.priority = 1;
+    mySecondCard.priority = 2;
     addDealEffects(
         card: mySecondCard,
         dealSpeed: dealSpeed,
         moveToPosition: Vector2(700, 850));
 
+    Card myThirdCard = Card.create(CardName.coldtouch)
+      ..dragStartingPosition = Vector2(1100, 850)
+      ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1);
+    myThirdCard.position = deckPosition;
+    myThirdCard.priority = 1;
+    addDealEffects(
+        card: myThirdCard,
+        dealSpeed: dealSpeed,
+        moveToPosition: Vector2(1100, 850));
+
     add(myCard);
     add(mySecondCard);
+    add(myThirdCard);
     add(PlayCardArea()
       ..width = size.x
       ..height = size.y / 3.5);
