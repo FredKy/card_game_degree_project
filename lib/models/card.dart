@@ -13,11 +13,39 @@ import 'package:flame/experimental.dart';
 
 import '../game/utils.dart' as utils;
 
+const shadows = [
+  Shadow(
+      // bottomLeft
+      offset: Offset(-2, -2),
+      color: Colors.black),
+  Shadow(
+      // bottomRight
+      offset: Offset(2, -2),
+      color: Colors.black),
+  Shadow(
+      // topRight
+      offset: Offset(2, 2),
+      color: Colors.black),
+  Shadow(
+      // topLeft
+      offset: Offset(-2, 2),
+      color: Colors.black),
+];
 final regular = TextPaint(
     style: const TextStyle(
         color: Color.fromARGB(255, 231, 231, 231),
         fontSize: 30,
-        fontFamily: 'Yoster'));
+        fontFamily: 'Yoster',
+        shadows: shadows
+
+        /* background: Paint()
+    ..style = PaintingStyle.fill
+    ..color = const Color.fromARGB(255, 231, 231, 231), */
+        /* foreground: Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 1
+    ..color = Colors.black, */
+        ));
 final costTextPaint = TextPaint(
     style: const TextStyle(
         color: Color.fromARGB(255, 46, 46, 46),
@@ -27,7 +55,8 @@ final descriptionTextPaint = TextPaint(
     style: const TextStyle(
         color: Color.fromARGB(255, 231, 231, 231),
         fontSize: 25,
-        fontFamily: 'Yoster'));
+        fontFamily: 'Yoster',
+        shadows: shadows));
 
 class Card extends PositionComponent
     with
@@ -270,8 +299,8 @@ class Card extends PositionComponent
       add(MoveByEffect(
           Vector2(0, -500),
           EffectController(
-              duration: duration/2,
-              reverseDuration: duration/2,
+              duration: duration / 2,
+              reverseDuration: duration / 2,
               curve: Curves.ease)));
       add(RotateEffect.by(
         -(8 / 4) * pi,
