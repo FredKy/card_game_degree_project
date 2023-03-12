@@ -13,50 +13,23 @@ import 'package:flame/experimental.dart';
 
 import '../game/utils.dart' as utils;
 
-const shadows = [
-  Shadow(
-      // bottomLeft
-      offset: Offset(-2, -2),
-      color: Colors.black),
-  Shadow(
-      // bottomRight
-      offset: Offset(2, -2),
-      color: Colors.black),
-  Shadow(
-      // topRight
-      offset: Offset(2, 2),
-      color: Colors.black),
-  Shadow(
-      // topLeft
-      offset: Offset(-2, 2),
-      color: Colors.black),
-];
-final regular = TextPaint(
-    style: const TextStyle(
-        color: Color.fromARGB(255, 231, 231, 231),
+final nameTextPaint = TextPaint(
+    style: TextStyle(
+        color: const Color.fromARGB(255, 231, 231, 231),
         fontSize: 30,
         fontFamily: 'Yoster',
-        shadows: shadows
-
-        /* background: Paint()
-    ..style = PaintingStyle.fill
-    ..color = const Color.fromARGB(255, 231, 231, 231), */
-        /* foreground: Paint()
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = 1
-    ..color = Colors.black, */
-        ));
+        shadows: utils.getShadows(2)));
 final costTextPaint = TextPaint(
     style: const TextStyle(
         color: Color.fromARGB(255, 46, 46, 46),
         fontSize: 50,
         fontFamily: 'Yoster'));
 final descriptionTextPaint = TextPaint(
-    style: const TextStyle(
-        color: Color.fromARGB(255, 231, 231, 231),
+    style: TextStyle(
+        color: const Color.fromARGB(255, 231, 231, 231),
         fontSize: 25,
         fontFamily: 'Yoster',
-        shadows: shadows));
+        shadows: utils.getShadows(2)));
 
 class Card extends PositionComponent
     with
@@ -223,7 +196,7 @@ class Card extends PositionComponent
     if (_faceUp) {
       cardNameText
         ..text = name
-        ..textRenderer = regular
+        ..textRenderer = nameTextPaint
         ..anchor = Anchor.center
         ..position = Vector2(size.x / 2, 28);
       add(cardNameText);

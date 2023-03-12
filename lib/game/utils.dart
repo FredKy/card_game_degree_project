@@ -1,8 +1,29 @@
 library utils;
 
 import 'dart:math';
-import 'dart:ui';
 import 'package:flame/game.dart';
+import 'package:flutter/material.dart';
+
+List<Shadow> getShadows(double n) {
+  return [
+    Shadow(
+        // bottomLeft
+        offset: Offset(-n, -n),
+        color: Colors.black),
+    Shadow(
+        // bottomRight
+        offset: Offset(n, -n),
+        color: Colors.black),
+    Shadow(
+        // topRight
+        offset: Offset(n, n),
+        color: Colors.black),
+    Shadow(
+        // topLeft
+        offset: Offset(-n, n),
+        color: Colors.black),
+  ];
+}
 
 T getRandomElement<T>(List<T> list) {
   final random = Random();
@@ -33,5 +54,3 @@ num fourth(double x, double lifespan) {
     return pow((lifespan - (x - lifespan / parts)) / lifespan, 4);
   }
 }
-
-
