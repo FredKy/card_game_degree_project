@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:card_game_degree_project/models/deck.dart';
 import 'package:card_game_degree_project/models/discard_pile.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
@@ -23,21 +24,22 @@ class CardGame extends FlameGame
     const Rect.fromLTWH(0, 0, cardWidth, cardHeight),
     const Radius.circular(cardRadius),
   );
-  static final Vector2 deckPosition = Vector2(1820, 850);
+  static final Vector2 deckPosition = Vector2(1860, 850);
   static final Vector2 discardPilePosition = Vector2(65, 850);
-  List<CardName> deckCards = [
-    CardName.icecannon,
-    CardName.coldtouch,
-    CardName.warptime,
-    CardName.icecannon,
-    CardName.icecannon,
-    CardName.coldtouch,
-    CardName.warptime,
-    CardName.icecannon,
-    CardName.icecannon,
-    CardName.coldtouch,
-  ];
+  //List<CardName> cardsToDeal = [];
   List<Card> hand = [];
+  Deck playerDeck = Deck(cardList: [
+    CardName.icecannon,
+    CardName.coldtouch,
+    CardName.warptime,
+    CardName.icecannon,
+    CardName.icecannon,
+    CardName.coldtouch,
+    CardName.warptime,
+    CardName.icecannon,
+    CardName.icecannon,
+    CardName.coldtouch,
+  ]);
   bool animated = true;
   double dealSpeed = 1;
   double dealInterval = 0.1;
@@ -105,12 +107,25 @@ class CardGame extends FlameGame
         }
       }
     } */
-
-    dealCards(cardsToDeal: deckCards);
+    playerDeck.shuffle();
+    playerDeck.priority = 100;
+    add(playerDeck);
     add(DiscardPile()..priority = 100);
+    dealCards(cardsToDeal: getCardsToDealFromDeck(4));
+
     add(PlayCardArea()
       ..width = size.x
       ..height = size.y / 3.5);
+  }
+
+  List<CardName> getCardsToDealFromDeck(int n) {
+    List<CardName> cardsToDeal = [];
+    if (playerDeck.cardList.length >= n) {
+      for (var i = 0; i < n; i++) {
+        cardsToDeal.add(playerDeck.removeCardFromTop());
+      }
+    }
+    return cardsToDeal;
   }
 
   void dealCards({required List<CardName> cardsToDeal}) {
