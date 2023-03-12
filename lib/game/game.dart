@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:card_game_degree_project/models/discard_pile.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/experimental.dart';
@@ -35,9 +36,6 @@ class CardGame extends FlameGame
     CardName.icecannon,
     CardName.icecannon,
     CardName.coldtouch,
-
-/*     CardName.icecannon,
-    CardName.icecannon, */
   ];
   List<Card> hand = [];
   bool animated = true;
@@ -99,10 +97,7 @@ class CardGame extends FlameGame
     } */
 
     dealCards(cardsToDeal: deckCards);
-    var myDiscardPile = Card.create(CardName.discardpile)
-      ..scale = Vector2.all(0.4)
-      ..position = discardPilePosition;
-    add(myDiscardPile);
+    add(DiscardPile());
     add(PlayCardArea()
       ..width = size.x
       ..height = size.y / 3.5);

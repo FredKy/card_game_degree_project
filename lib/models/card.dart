@@ -57,24 +57,16 @@ class Card extends PositionComponent
     this.power = 0,
     this.imageNumber = 19,
     this.dragStartingPosition,
-  }) : super(size: CardGame.cardSize);
+  }) : super(size: CardGame.cardSize, anchor: Anchor.center);
 
   factory Card.create(CardName name) {
     switch (name) {
-      case CardName.discardpile:
-        return Card(id: 0, description: "Discard Pile", imageNumber: 19)
-          ..anchor = Anchor.center
-          .._faceUp = false
-          ..canBeMoved = false;
       case CardName.icecannon:
-        return Card(id: 1, description: "Ice Cannon", imageNumber: 19)
-          ..anchor = Anchor.center;
+        return Card(id: 1, description: "Ice Cannon", imageNumber: 19);
       case CardName.warptime:
-        return Card(id: 2, description: "Warp Time", imageNumber: 29)
-          ..anchor = Anchor.center;
+        return Card(id: 2, description: "Warp Time", imageNumber: 29);
       case CardName.coldtouch:
-        return Card(id: 3, description: "Cold Touch", imageNumber: 38)
-          ..anchor = Anchor.center;
+        return Card(id: 3, description: "Cold Touch", imageNumber: 38);
       default:
         return Card(id: -1, dragStartingPosition: Vector2(0, 0));
     }
@@ -202,19 +194,7 @@ class Card extends PositionComponent
     super.update(dt);
 
     if (showParticleTrail) {
-      final particleComponent = ParticleSystemComponent(
-        particle: Particle.generate(
-            count: 10,
-            lifespan: 3,
-            generator: (i) => AcceleratedParticle(
-                acceleration: getRandomVectorLocal(),
-                speed: getRandomVectorLocal(),
-                position: (/* Vector2(0, size.x * 0.3) + */ position.clone()),
-                child: CircleParticle(
-                  radius: 5.5,
-                  paint: Paint()..color = getRandomColor(),
-                ))),
-      );
+      final particleComponent = getTrail();
       game.add(particleComponent);
     }
   }
@@ -246,39 +226,8 @@ class Card extends PositionComponent
     if (_isInPlayCardArea) {
       _isDragging = false;
       canBeMoved = false;
-      showParticleTrail = true;
-      final particleComponent = ParticleSystemComponent(
-          particle: Particle.generate(
-              count: 30,
-              lifespan: 1.5,
-              generator: (i) => AcceleratedParticle(
-                    acceleration: utils.getRandomVector(300),
-                    speed: utils.getRandomVector(100),
-                    position:
-                        (/* Vector2(0, size[1] * 0.3) + */ position.clone()),
-                    child: ComputedParticle(
-                      renderer: (canvas, particle) {
-                        // Override the color to dynamically update opacity
-                        paint.color = utils.getRandomColor().withOpacity(
-                            utils.fourth(particle.progress, 1.5) as double);
-
-                        canvas.drawCircle(
-                          Offset.zero,
-                          // Closer to the end of lifespan particles
-                          // will turn into larger glaring circles
-                          Random().nextDouble() * particle.progress > .4
-                              ? (particle.progress > 0.7
-                                  ? Random().nextDouble() *
-                                      (10 * particle.progress)
-                                  : Random().nextDouble() *
-                                      (3 * particle.progress))
-                              : 1 + (30 * particle.progress),
-                          paint,
-                        );
-                      },
-                    ),
-                  )));
-      game.add(particleComponent);
+      //showParticleTrail = true;
+      //game.add(getParticleComponent());
       double duration = 0.6;
       add(ScaleEffect.to(
           Vector2.all(0.3),
@@ -366,6 +315,56 @@ class Card extends PositionComponent
     return getRandomElement(list);
   }
 
+  ParticleSystemComponent getParticleExplosion() {
+    return ParticleSystemComponent(
+        particle: Particle.generate(
+            count: 30,
+            lifespan: 1.5,
+            generator: (i) => AcceleratedParticle(
+                  acceleration: utils.getRandomVector(300),
+                  speed: utils.getRandomVector(100),
+                  position:
+                      (/* Vector2(0, size[1] * 0.3) + */ position.clone()),
+                  child: ComputedParticle(
+                    renderer: (canvas, particle) {
+                      // Override the color to dynamically update opacity
+                      paint.color = utils.getRandomColor().withOpacity(
+                          utils.fourth(particle.progress, 1.5) as double);
+
+                      canvas.drawCircle(
+                        Offset.zero,
+                        // Closer to the end of lifespan particles
+                        // will turn into larger glaring circles
+                        Random().nextDouble() * particle.progress > .4
+                            ? (particle.progress > 0.7
+                                ? Random().nextDouble() *
+                                    (10 * particle.progress)
+                                : Random().nextDouble() *
+                                    (3 * particle.progress))
+                            : 1 + (30 * particle.progress),
+                        paint,
+                      );
+                    },
+                  ),
+                )));
+  }
+
+  ParticleSystemComponent getTrail() {
+    return ParticleSystemComponent(
+      particle: Particle.generate(
+          count: 10,
+          lifespan: 3,
+          generator: (i) => AcceleratedParticle(
+              acceleration: getRandomVectorLocal(),
+              speed: getRandomVectorLocal(),
+              position: (/* Vector2(0, size.x * 0.3) + */ position.clone()),
+              child: CircleParticle(
+                radius: 5.5,
+                paint: Paint()..color = getRandomColor(),
+              ))),
+    );
+  }
+
   /* //Cards for factory
 
   static late final Map<CardName, Card> _singletons = {
@@ -382,5 +381,4 @@ enum CardName {
   icecannon,
   warptime,
   coldtouch,
-  discardpile,
 }
