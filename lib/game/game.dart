@@ -22,15 +22,22 @@ class CardGame extends FlameGame
     const Rect.fromLTWH(0, 0, cardWidth, cardHeight),
     const Radius.circular(cardRadius),
   );
-  static final Vector2 deckPosition = Vector2(1720, 850);
+  static final Vector2 deckPosition = Vector2(1820, 850);
+  static final Vector2 discardPilePosition = Vector2(100, 850);
   List<CardName> deckCards = [
     CardName.icecannon,
     CardName.coldtouch,
     CardName.warptime,
     CardName.icecannon,
     CardName.icecannon,
+    CardName.coldtouch,
+    CardName.warptime,
     CardName.icecannon,
     CardName.icecannon,
+    CardName.coldtouch,
+
+/*     CardName.icecannon,
+    CardName.icecannon, */
   ];
   List<Card> hand = [];
   bool animated = true;
@@ -91,38 +98,11 @@ class CardGame extends FlameGame
       }
     } */
 
-    /* Card myCard = Card.create(CardName.icecannon)
-      ..dragStartingPosition = Vector2(300, 850)
-      ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1);
-    myCard.position = deckPosition;
-    myCard.priority = 3;
-    addDealEffects(
-        card: myCard, dealSpeed: dealSpeed, moveToPosition: Vector2(300, 850));
-
-    Card mySecondCard = Card.create(CardName.warptime)
-      ..dragStartingPosition = Vector2(700, 850)
-      ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1);
-    mySecondCard.position = deckPosition;
-    mySecondCard.priority = 2;
-    addDealEffects(
-        card: mySecondCard,
-        dealSpeed: dealSpeed,
-        moveToPosition: Vector2(700, 850));
-
-    Card myThirdCard = Card.create(CardName.coldtouch)
-      ..dragStartingPosition = Vector2(1100, 850)
-      ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1);
-    myThirdCard.position = deckPosition;
-    myThirdCard.priority = 1;
-    addDealEffects(
-        card: myThirdCard,
-        dealSpeed: dealSpeed,
-        moveToPosition: Vector2(1100, 850));
-
-    add(myCard);
-    add(mySecondCard);
-    add(myThirdCard); */
     dealCards(cardsToDeal: deckCards);
+    var myDiscardPile = Card.create(CardName.discardpile)
+      ..scale = Vector2.all(0.4)
+      ..position = discardPilePosition;
+    add(myDiscardPile);
     add(PlayCardArea()
       ..width = size.x
       ..height = size.y / 3.5);
@@ -130,39 +110,43 @@ class CardGame extends FlameGame
 
   void dealCards({required List<CardName> cardsToDeal}) {
     double y = 850;
-    switch (cardsToDeal.length) {
-      case 1:
-        hand.add(Card.create(cardsToDeal[0])
-          ..dragStartingPosition = Vector2(size.x / 2, y)
+    if (cardsToDeal.length == 1) {
+      hand.add(Card.create(cardsToDeal[0])
+        ..dragStartingPosition = Vector2(size.x / 2, y)
+        ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1));
+      hand[0].position = deckPosition;
+      hand[0].priority = 1;
+      addDealEffects(
+          startDelay: 0,
+          card: hand[0],
+          dealSpeed: dealSpeed,
+          moveToPosition: Vector2(size.x / 2, y));
+      add(hand[0]);
+    } else if (cardsToDeal.length > 1) {
+      /* var padding;
+      if (cardsToDeal.length > 5) {
+        padding = 200;
+      } else {
+        padding = 200 + 160 * (5 - cardsToDeal.length);
+      } */
+      var padding =
+          (cardsToDeal.length > 5) ? 360 : 360 + 160 * (5 - cardsToDeal.length);
+      var space = (size.x - 2 * padding) / (cardsToDeal.length - 1);
+      for (var i = 0; i < cardsToDeal.length; i++) {
+        //var tempCard;
+        hand.add(Card.create(cardsToDeal[i])
+          ..dragStartingPosition = Vector2(padding + space * i, y)
           ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1));
-        hand[0].position = deckPosition;
-        hand[0].priority = 1;
+        hand[i].position = deckPosition;
+        //hand[i].priority = cardsToDeal.length - i;
+        hand[i].priority = i + 1;
         addDealEffects(
-            startDelay: 0,
-            card: hand[0],
+            startDelay: i * dealInterval,
+            card: hand[i],
             dealSpeed: dealSpeed,
-            moveToPosition: Vector2(size.x / 2, y));
-        add(hand[0]);
-        break;
-      //case 2:
-
-      default:
-        var space = (size.x - 400) / (cardsToDeal.length - 1);
-        for (var i = 0; i < cardsToDeal.length; i++) {
-          //var tempCard;
-          hand.add(Card.create(cardsToDeal[i])
-            ..dragStartingPosition = Vector2(200 + space * i, y)
-            ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1));
-          hand[i].position = deckPosition;
-          hand[i].priority = cardsToDeal.length - i;
-          addDealEffects(
-              startDelay: i * dealInterval,
-              card: hand[i],
-              dealSpeed: dealSpeed,
-              moveToPosition: Vector2(200 + space * i, y));
-          add(hand[i]);
-        }
-        break;
+            moveToPosition: Vector2(padding + space * i, y));
+        add(hand[i]);
+      }
     }
   }
 
@@ -174,7 +158,7 @@ class CardGame extends FlameGame
     if (elapsedMilliseconds >= turnStartDelayMS) {
       for (final child in children) {
         if (child is Card) {
-          child.canBeMoved = true;
+          if (child.id != 0) child.canBeMoved = true;
         }
       }
     }

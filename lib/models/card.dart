@@ -61,6 +61,11 @@ class Card extends PositionComponent
 
   factory Card.create(CardName name) {
     switch (name) {
+      case CardName.discardpile:
+        return Card(id: 0, description: "Discard Pile", imageNumber: 19)
+          ..anchor = Anchor.center
+          .._faceUp = false
+          ..canBeMoved = false;
       case CardName.icecannon:
         return Card(id: 1, description: "Ice Cannon", imageNumber: 19)
           ..anchor = Anchor.center;
@@ -71,7 +76,7 @@ class Card extends PositionComponent
         return Card(id: 3, description: "Cold Touch", imageNumber: 38)
           ..anchor = Anchor.center;
       default:
-        return Card(id: 0, dragStartingPosition: Vector2(0, 0));
+        return Card(id: -1, dragStartingPosition: Vector2(0, 0));
     }
   }
 
@@ -172,12 +177,14 @@ class Card extends PositionComponent
 
     startingPriority = priority;
 
-    textComponent
-      ..text = description
-      ..textRenderer = regular
-      ..anchor = Anchor.center
-      ..position = Vector2(size.x / 2, 25);
-    add(textComponent);
+    if (_faceUp) {
+      textComponent
+        ..text = description
+        ..textRenderer = regular
+        ..anchor = Anchor.center
+        ..position = Vector2(size.x / 2, 25);
+      add(textComponent);
+    }
 
     final defaultPaint = Paint()
       ..color = _defaultColor
@@ -280,14 +287,14 @@ class Card extends PositionComponent
             curve: Curves.ease,
           )));
       add(RotateEffect.by(
-        (3 / 4) * pi,
+        -(8 / 4) * pi,
         EffectController(
-          duration: duration,
+          duration: duration * 0.8,
           curve: Curves.ease,
         ),
       ));
       add(MoveEffect.to(
-        CardGame.deckPosition,
+        CardGame.discardPilePosition,
         EffectController(
           duration: 0.3,
           curve: Curves.easeOut,
@@ -375,4 +382,5 @@ enum CardName {
   icecannon,
   warptime,
   coldtouch,
+  discardpile,
 }
