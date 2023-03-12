@@ -28,6 +28,9 @@ class CardGame extends FlameGame
     CardName.coldtouch,
     CardName.warptime,
     CardName.icecannon,
+    CardName.icecannon,
+    CardName.icecannon,
+    CardName.icecannon,
   ];
   List<Card> hand = [];
   bool animated = true;
@@ -119,26 +122,47 @@ class CardGame extends FlameGame
     add(myCard);
     add(mySecondCard);
     add(myThirdCard); */
-    dealCards(deck: deckCards);
+    dealCards(cardsToDeal: deckCards);
     add(PlayCardArea()
       ..width = size.x
       ..height = size.y / 3.5);
   }
 
-  void dealCards({required List<CardName> deck}) {
-    for (var i = 0; i < deck.length; i++) {
-      //var tempCard;
-      hand.add(Card.create(deck[i])
-        ..dragStartingPosition = Vector2(300 + 400.0 * i, 850)
-        ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1));
-      hand[i].position = deckPosition;
-      hand[i].priority = deck.length - i;
-      addDealEffects(
-          startDelay: i * dealInterval,
-          card: hand[i],
-          dealSpeed: dealSpeed,
-          moveToPosition: Vector2(300 + 400.0 * i, 850));
-      add(hand[i]);
+  void dealCards({required List<CardName> cardsToDeal}) {
+    double y = 850;
+    switch (cardsToDeal.length) {
+      case 1:
+        hand.add(Card.create(cardsToDeal[0])
+          ..dragStartingPosition = Vector2(size.x / 2, y)
+          ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1));
+        hand[0].position = deckPosition;
+        hand[0].priority = 1;
+        addDealEffects(
+            startDelay: 0,
+            card: hand[0],
+            dealSpeed: dealSpeed,
+            moveToPosition: Vector2(size.x / 2, y));
+        add(hand[0]);
+        break;
+      //case 2:
+
+      default:
+        var space = (size.x - 400) / (cardsToDeal.length - 1);
+        for (var i = 0; i < cardsToDeal.length; i++) {
+          //var tempCard;
+          hand.add(Card.create(cardsToDeal[i])
+            ..dragStartingPosition = Vector2(200 + space * i, y)
+            ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1));
+          hand[i].position = deckPosition;
+          hand[i].priority = cardsToDeal.length - i;
+          addDealEffects(
+              startDelay: i * dealInterval,
+              card: hand[i],
+              dealSpeed: dealSpeed,
+              moveToPosition: Vector2(200 + space * i, y));
+          add(hand[i]);
+        }
+        break;
     }
   }
 
