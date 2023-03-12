@@ -23,7 +23,13 @@ class CardGame extends FlameGame
     const Radius.circular(cardRadius),
   );
   static final Vector2 deckPosition = Vector2(1720, 850);
-
+  List<CardName> deckCards = [
+    CardName.icecannon,
+    CardName.coldtouch,
+    CardName.warptime,
+    CardName.icecannon,
+  ];
+  List<Card> hand = [];
   bool animated = true;
   double dealSpeed = 1;
   double dealInterval = 0.1;
@@ -82,7 +88,7 @@ class CardGame extends FlameGame
       }
     } */
 
-    Card myCard = Card.create(CardName.icecannon)
+    /* Card myCard = Card.create(CardName.icecannon)
       ..dragStartingPosition = Vector2(300, 850)
       ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1);
     myCard.position = deckPosition;
@@ -112,10 +118,28 @@ class CardGame extends FlameGame
 
     add(myCard);
     add(mySecondCard);
-    add(myThirdCard);
+    add(myThirdCard); */
+    dealCards(deck: deckCards);
     add(PlayCardArea()
       ..width = size.x
       ..height = size.y / 3.5);
+  }
+
+  void dealCards({required List<CardName> deck}) {
+    for (var i = 0; i < deck.length; i++) {
+      //var tempCard;
+      hand.add(Card.create(deck[i])
+        ..dragStartingPosition = Vector2(300 + 400.0 * i, 850)
+        ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1));
+      hand[i].position = deckPosition;
+      hand[i].priority = deck.length - i;
+      addDealEffects(
+          startDelay: i * dealInterval,
+          card: hand[i],
+          dealSpeed: dealSpeed,
+          moveToPosition: Vector2(300 + 400.0 * i, 850));
+      add(hand[i]);
+    }
   }
 
   @override
@@ -155,12 +179,14 @@ class CardGame extends FlameGame
 void addDealEffects(
     {required Card card,
     required double dealSpeed,
-    required Vector2 moveToPosition}) {
+    required Vector2 moveToPosition,
+    required double startDelay}) {
   card.scale = Vector2(0, 0);
   card.add(
     MoveEffect.to(
       moveToPosition,
       EffectController(
+        startDelay: startDelay,
         duration: dealSpeed * 2,
         curve: Curves.easeOutCirc,
       ),
@@ -169,6 +195,7 @@ void addDealEffects(
   card.add(MoveByEffect(
       Vector2(0, -300),
       EffectController(
+          startDelay: startDelay,
           duration: dealSpeed * 0.4,
           reverseDuration: dealSpeed * 0.4,
           curve: Curves.ease)));
@@ -176,6 +203,7 @@ void addDealEffects(
     RotateEffect.by(
       -4.0 * pi,
       EffectController(
+        startDelay: startDelay,
         duration: dealSpeed * 0.6,
         curve: Curves.ease,
       ),
@@ -184,6 +212,7 @@ void addDealEffects(
   card.add(ScaleEffect.to(
       Vector2.all(1),
       EffectController(
+        startDelay: startDelay,
         duration: dealSpeed * 0.6,
         //reverseDuration: 0.15,
         curve: Curves.ease,

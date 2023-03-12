@@ -111,30 +111,32 @@ class Card extends PositionComponent
       cardRRect,
       frontBorderPaint,
     );
+    var pos = Vector2(size.x / 2, size.y * (0.38));
+    var scale = 1.125;
     switch (imageNumber) {
       case 19:
         iceCannonSprite.render(canvas,
-            position: Vector2(size.x / 2, size.y * (0.38)),
+            position: pos,
             anchor: Anchor.center,
-            size: iceCannonSprite.srcSize.scaled(1.125));
+            size: iceCannonSprite.srcSize.scaled(scale));
         break;
       case 29:
         warpTimeSprite.render(canvas,
-            position: Vector2(size.x / 2, size.y * (0.38)),
+            position: pos,
             anchor: Anchor.center,
-            size: warpTimeSprite.srcSize.scaled(1.125));
+            size: warpTimeSprite.srcSize.scaled(scale));
         break;
       case 38:
         coldTouchSprite.render(canvas,
-            position: Vector2(size.x / 2, size.y * (0.38)),
+            position: pos,
             anchor: Anchor.center,
-            size: warpTimeSprite.srcSize.scaled(1.125));
+            size: warpTimeSprite.srcSize.scaled(scale));
         break;
       default:
         iceCannonSprite.render(canvas,
-            position: Vector2(size.x / 2, size.y * (0.38)),
+            position: pos,
             anchor: Anchor.center,
-            size: warpTimeSprite.srcSize.scaled(1.125));
+            size: warpTimeSprite.srcSize.scaled(scale));
         break;
     }
   }
