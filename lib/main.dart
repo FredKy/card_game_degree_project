@@ -8,7 +8,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // This opens the app in fullscreen mode.
-  await Flame.device.fullScreen();
+  //await Flame.device.fullScreen();
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,

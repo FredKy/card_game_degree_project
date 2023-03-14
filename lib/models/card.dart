@@ -120,11 +120,11 @@ class Card extends PositionComponent
     ..strokeWidth = 12;
 
   static late final Sprite iceCannonSprite =
-      cardGameSprite(19 * 256, 0, 256, 192);
+      cardImageSprite(19 * 256, 0, 256, 192);
   static late final Sprite warpTimeSprite =
-      cardGameSprite(29 * 256, 64, 256, 192);
+      cardImageSprite(29 * 256, 64, 256, 192);
   static late final Sprite coldTouchSprite =
-      cardGameSprite(38 * 256, 64, 256, 192);
+      cardImageSprite(38 * 256, 64, 256, 192);
 
   void _renderFront(Canvas canvas) {
     canvas.drawRRect(cardRRect, frontBackgroundPaint);

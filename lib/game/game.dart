@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:card_game_degree_project/game/player.dart';
 import 'package:card_game_degree_project/models/deck.dart';
 import 'package:card_game_degree_project/models/discard_pile.dart';
 import 'package:flame/components.dart';
@@ -66,6 +67,8 @@ class CardGame extends FlameGame
   @override
   Future<void> onLoad() async {
     await Flame.images.load('aeromancer_spritesheet.png');
+    await Flame.images.load('player_idle.png');
+
     camera.viewport = FixedResolutionViewport(Vector2(1920, 1080));
 
     countdown = Timer(5);
@@ -87,13 +90,7 @@ class CardGame extends FlameGame
 
     //add(ScreenHitbox());
 
-    /* add(
-      Player()
-        ..position = size / 2
-        ..width = 50
-        ..height = 100
-        ..anchor = Anchor.center,
-    ); */
+    add(Player()..position = Vector2(size.x / 4, size.y / 3));
 
     /* final random = Random();
     for (var i = 0; i < 7; i++) {
@@ -111,7 +108,7 @@ class CardGame extends FlameGame
     playerDeck.priority = 100;
     add(playerDeck);
     add(DiscardPile()..priority = 100);
-    dealCards(cardsToDeal: getCardsToDealFromDeck(4));
+    dealCards(cardsToDeal: getCardsToDealFromDeck(7));
 
     add(PlayCardArea()
       ..width = size.x
@@ -285,7 +282,23 @@ void addDealEffects(
       )));
 }
 
-Sprite cardGameSprite(double x, double y, double width, double height) {
+Sprite cardImageSprite(double x, double y, double width, double height) {
+  return Sprite(
+    Flame.images.fromCache('aeromancer_spritesheet.png'),
+    srcPosition: Vector2(x, y),
+    srcSize: Vector2(width, height),
+  );
+}
+
+Sprite getPlayerSprite(
+    double x, double y, double width, double height, String state) {
+  if (state == "idle") {
+    return Sprite(
+      Flame.images.fromCache('player_idle.png'),
+      srcPosition: Vector2(x, y),
+      srcSize: Vector2(width, height),
+    );
+  }
   return Sprite(
     Flame.images.fromCache('aeromancer_spritesheet.png'),
     srcPosition: Vector2(x, y),
