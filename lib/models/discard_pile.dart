@@ -1,20 +1,36 @@
 import 'dart:async';
 
 import 'package:card_game_degree_project/game/game.dart';
+import 'package:card_game_degree_project/models/card.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:card_game_degree_project/game/utils.dart' as utils;
 
 class DiscardPile extends PositionComponent {
+  final List<CardName> cardList;
+
   late ShapeHitbox hitbox;
-  DiscardPile()
+  DiscardPile({required this.cardList})
       : super(
             size: CardGame.cardSize,
             anchor: Anchor.center,
             scale: Vector2.all(0.4),
             position: CardGame.discardPilePosition);
+
+  void addCardToTop(CardName cardName) {
+    cardList.add(cardName);
+  }
+
+  CardName removeCardFromTop() {
+    return cardList.removeLast();
+  }
+
+  void shuffle() {
+    cardList.shuffle();
+  }
 
   @override
   void render(Canvas canvas) {
@@ -23,11 +39,33 @@ class DiscardPile extends PositionComponent {
     canvas.drawRRect(backRRectInner, backBorderPaint2);
   }
 
+  final digitsTextPaint = TextPaint(
+      style: TextStyle(
+          color: const Color.fromARGB(255, 231, 231, 231),
+          fontSize: 50,
+          fontFamily: 'Yoster',
+          shadows: utils.getShadows(2)));
+
+  final TextComponent _cardsInDiscardPileText = TextComponent();
   @override
   FutureOr<void> onLoad() {
     super.onLoad();
+    _cardsInDiscardPileText
+      ..text = cardList.length.toString()
+      ..textRenderer = digitsTextPaint
+      ..anchor = Anchor.center
+      ..position = size / 2
+      ..scale = Vector2.all(3);
+    add(_cardsInDiscardPileText);
+
     final hitbox = RectangleHitbox(size: size, isSolid: true);
     add(hitbox);
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    _cardsInDiscardPileText.text = cardList.length.toString();
   }
 
   static final Paint backBackgroundPaint = Paint()

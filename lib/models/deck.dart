@@ -4,6 +4,7 @@ import 'package:card_game_degree_project/game/game.dart';
 import 'package:card_game_degree_project/models/card.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/painting.dart';
+import 'package:card_game_degree_project/game/utils.dart' as utils;
 
 class Deck extends PositionComponent {
   //Deck()
@@ -28,13 +29,20 @@ class Deck extends PositionComponent {
     cardList.shuffle();
   }
 
+  final digitsTextPaint = TextPaint(
+      style: TextStyle(
+          color: const Color.fromARGB(255, 231, 231, 231),
+          fontSize: 50,
+          fontFamily: 'Yoster',
+          shadows: utils.getShadows(2)));
+
   final TextComponent _cardsLeftText = TextComponent();
   @override
   FutureOr<void> onLoad() {
     super.onLoad();
     _cardsLeftText
       ..text = cardList.length.toString()
-      ..textRenderer = nameTextPaint
+      ..textRenderer = digitsTextPaint
       ..anchor = Anchor.center
       ..position = size / 2
       ..scale = Vector2.all(3);

@@ -15,6 +15,8 @@ import 'package:flame/collisions.dart';
 
 import '../models/card.dart';
 
+const String spriteSheetPath = 'aeromancer_spritesheet_pixelated.png';
+
 class CardGame extends FlameGame
     with HasTappableComponents, HasDraggables, HasCollisionDetection {
   static const double cardWidth = 300.0;
@@ -42,6 +44,10 @@ class CardGame extends FlameGame
     CardName.icecannon,
     CardName.coldtouch,
   ]);
+  DiscardPile discardPile = DiscardPile(cardList: [
+    CardName.icecannon,
+  ])
+    ..priority = 100;
   bool animated = true;
   double dealSpeed = 1;
   double dealInterval = 0.1;
@@ -69,7 +75,7 @@ class CardGame extends FlameGame
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    await Flame.images.load('aeromancer_spritesheet.png');
+    await Flame.images.load(spriteSheetPath);
     await Flame.images.load('player_idle.png');
 
     camera.viewport = FixedResolutionViewport(Vector2(1920, 1080));
@@ -110,7 +116,7 @@ class CardGame extends FlameGame
     playerDeck.shuffle();
     playerDeck.priority = 100;
     add(playerDeck);
-    add(DiscardPile()..priority = 100);
+    add(discardPile);
     dealCards(cardsToDeal: getCardsToDealFromDeck(7));
 
     add(PlayCardArea()
@@ -235,6 +241,14 @@ class CardGame extends FlameGame
     await Future.delayed(Duration(milliseconds: milliseconds));
     for (final child in children) {
       if (child is Card && child.toBeDestroyed) {
+        CardName cardName;
+        if (child.id == 1) cardName = CardName.icecannon;
+        if (child.id == 2) cardName = CardName.warptime;
+        if (child.id == 3)
+          cardName = CardName.coldtouch;
+        else
+          cardName = CardName.icecannon;
+        discardPile.addCardToTop(cardName);
         remove(child);
       }
     }
@@ -312,7 +326,7 @@ void addDealEffects(
 
 Sprite cardImageSprite(double x, double y, double width, double height) {
   return Sprite(
-    Flame.images.fromCache('aeromancer_spritesheet.png'),
+    Flame.images.fromCache(spriteSheetPath),
     srcPosition: Vector2(x, y),
     srcSize: Vector2(width, height),
   );
@@ -328,7 +342,7 @@ Sprite getPlayerSprite(
     );
   }
   return Sprite(
-    Flame.images.fromCache('aeromancer_spritesheet.png'),
+    Flame.images.fromCache(spriteSheetPath),
     srcPosition: Vector2(x, y),
     srcSize: Vector2(width, height),
   );

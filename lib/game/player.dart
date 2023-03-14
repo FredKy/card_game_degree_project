@@ -32,7 +32,7 @@ class Player extends PositionComponent
     idleAnimation.getSprite().render(canvas,
         position: Vector2(size.x / 2, size.y / 2),
         anchor: Anchor.center,
-        size: playerSprite.srcSize.scaled(4));
+        size: playerSprite.srcSize.scaled(6));
   }
 
   void update(double dt) {
