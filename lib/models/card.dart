@@ -4,8 +4,9 @@ import 'dart:math';
 import 'package:card_game_degree_project/game/player.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/effects.dart';
+import 'package:flame/input.dart';
 import 'package:flame/particles.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Draggable;
 
 import 'package:card_game_degree_project/game/game.dart';
 import 'package:flame/components.dart';
@@ -32,11 +33,7 @@ final descriptionTextPaint = TextPaint(
         shadows: utils.getShadows(2)));
 
 class Card extends PositionComponent
-    with
-        DragCallbacks,
-        CollisionCallbacks,
-        HasPaint,
-        HasGameReference<CardGame> {
+    with Draggable, CollisionCallbacks, HasPaint, HasGameReference<CardGame> {
   String name, description, type;
   int id, cost, power, imageNumber;
 
@@ -57,6 +54,9 @@ class Card extends PositionComponent
 
   Vector2? dragStartingPosition;
   late int startingPriority;
+
+  bool toBeDestroyed = false;
+  //bool get getToBeDestroyed => toBeDestroyed;
 
   final _collisionColor = Colors.amber;
   final _defaultColor = Colors.cyan;
@@ -225,15 +225,39 @@ class Card extends PositionComponent
     }
   }
 
+  Vector2? dragDeltaPosition;
+  bool get isDragging => dragDeltaPosition != null;
+
   @override
+  bool onDragStart(DragStartInfo startPosition) {
+    print("onDragStart: " + canBeMoved.toString());
+    if (canBeMoved) {
+      dragDeltaPosition = startPosition.eventPosition.game - position;
+      priority = 100;
+    }
+    return false;
+  }
+
+  /* @override
   void onDragStart(DragStartEvent event) {
     if (canBeMoved) {
       _isDragging = true;
       priority = 100;
     }
-  }
+  } */
 
   @override
+  bool onDragUpdate(DragUpdateInfo event) {
+    if (canBeMoved) {
+      if (isDragging) {
+        final localCoords = event.eventPosition.game;
+        position = localCoords - dragDeltaPosition!;
+      }
+    }
+    return false;
+  }
+
+  /* @override
   void onDragUpdate(DragUpdateEvent event) {
     if (canBeMoved) {
       if (!_isDragging) {
@@ -242,20 +266,20 @@ class Card extends PositionComponent
       final delta = event.delta;
       position.add(delta);
     }
-  }
+  } */
 
   @override
-  void onDragEnd(DragEndEvent event) async {
-    if (!_isDragging) {
-      return;
-    }
+  bool onDragEnd(DragEndInfo event) {
+    print(canBeMoved);
     if (_isInPlayCardArea) {
-      _isDragging = false;
+      //_isDragging = false;
+      double duration = 0.4;
       canBeMoved = false;
+
       hasBeenPlayed = true;
       //showParticleTrail = true;
       //game.add(getParticleComponent());
-      double duration = 0.4;
+
       game.moveCards();
       add(MoveEffect.to(
         CardGame.discardPilePosition,
@@ -298,12 +322,19 @@ class Card extends PositionComponent
       hitbox.collisionType = CollisionType.inactive;
       frontBorderPaint.color = _defaultBorderColor;
 
-      await Future.delayed(
-          Duration(milliseconds: (duration * 1000 + 1).toInt()));
-      game.activateCards();
-      destroy();
+      /* await Future.delayed(
+          Duration(milliseconds: (duration * 1000 + 1).toInt())); */
+      //delayTime((duration * 1000 + 1).toInt());
+      game.disablePlayerInput((1000 * duration + 1).toInt());
+      toBeDestroyed = true;
+      game.destroyCardsScheduledForDestructionAfterCountdown(
+          (1000 * duration + 100).toInt());
+      /* game.disableRemainingCardsAndRemovePlayedCard(
+          (duration * 1000 + 1).toInt()); */
+      //game.activateCards();
+      //destroy();
     } else {
-      _isDragging = false;
+      //_isDragging = false;
       canBeMoved = false;
       add(MoveEffect.to(
         dragStartingPosition ?? Vector2(0, 0),
@@ -312,10 +343,20 @@ class Card extends PositionComponent
           curve: Curves.easeOut,
         ),
       ));
-      await Future.delayed(const Duration(milliseconds: 201));
+      //delayTime(201);
+      //game.disableRemainingCardsAndRemovePlayedCard(201);
+      game.disablePlayerInput((201).toInt());
       priority = startingPriority;
       canBeMoved = true;
     }
+    dragDeltaPosition = null;
+    return false;
+  }
+
+  @override
+  bool onDragCancel() {
+    dragDeltaPosition = null;
+    return false;
   }
 
   //Collision

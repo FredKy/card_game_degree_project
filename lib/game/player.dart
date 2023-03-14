@@ -4,10 +4,11 @@ import 'package:card_game_degree_project/game/game.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
-import 'package:flutter/material.dart';
+import 'package:flame/input.dart';
+import 'package:flutter/material.dart' hide Draggable;
 
 class Player extends PositionComponent
-    with CollisionCallbacks, HasGameReference<CardGame> {
+    with CollisionCallbacks, HasGameReference<CardGame>, Draggable {
   static final _paint = Paint()..color = Colors.white;
   Player() : super(size: Vector2(256, 320), anchor: Anchor.center);
 
@@ -26,8 +27,37 @@ class Player extends PositionComponent
         position: Vector2(size.x / 2, size.y / 2),
         anchor: Anchor.center,
         size: playerSprite.srcSize.scaled(4));
+    //_paint.color = _isDragged ? Colors.red : Colors.white;
+    //canvas.drawRect(size.toRect(), _paint);
   }
 
   static late final Sprite playerSprite =
       getPlayerSprite(32, 48, 128 - 2 * 32, 128, "idle");
+
+  /* bool _isDragged = false;
+
+  @override
+  void onDragStart(DragStartEvent event) => _isDragged = true;
+
+  @override
+  void onDragUpdate(DragUpdateEvent event) => position += event.delta;
+
+  @override
+  void onDragEnd(DragEndEvent event) => _isDragged = false; */
+  @override
+  void update(double dt) {
+    super.update(dt);
+    debugColor =
+        isDragged && parent is CardGame ? Colors.greenAccent : Colors.purple;
+  }
+
+  @override
+  bool onDragUpdate(DragUpdateInfo info) {
+    if (parent is! CardGame) {
+      return true;
+    }
+
+    position.add(info.delta.game);
+    return false;
+  }
 }

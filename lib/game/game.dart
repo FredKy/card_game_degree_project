@@ -9,13 +9,14 @@ import 'package:flame/effects.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
+import 'package:flame/input.dart';
 import 'package:flutter/material.dart' hide Card, Image, Draggable;
 import 'package:flame/collisions.dart';
 
 import '../models/card.dart';
 
 class CardGame extends FlameGame
-    with HasTappableComponents, HasDraggableComponents, HasCollisionDetection {
+    with HasTappableComponents, HasDraggables, HasCollisionDetection {
   static const double cardWidth = 300.0;
   static const double cardHeight = 420.0;
   static const double cardGap = 175.0;
@@ -66,6 +67,7 @@ class CardGame extends FlameGame
 
   @override
   Future<void> onLoad() async {
+    await super.onLoad();
     await Flame.images.load('aeromancer_spritesheet.png');
     await Flame.images.load('player_idle.png');
 
@@ -127,6 +129,7 @@ class CardGame extends FlameGame
 
   void dealCards({required List<CardName> cardsToDeal}) {
     double y = 850;
+    disablePlayerInput((dealSpeed * 1000 + cardsToDeal.length * 100).toInt());
     if (cardsToDeal.length == 1) {
       hand.add(Card.create(cardsToDeal[0])
         ..dragStartingPosition = Vector2(size.x / 2, y)
@@ -210,6 +213,37 @@ class CardGame extends FlameGame
         child.canBeMoved = true;
       }
     }
+  }
+
+  void disableRemainingCardsAndRemovePlayedCard(int milliseconds) async {
+    for (final child in children) {
+      if (child is Card) {
+        child.canBeMoved = false;
+      }
+    }
+    await Future.delayed(Duration(milliseconds: milliseconds));
+    for (final child in children) {
+      if (child is Card && child.toBeDestroyed) {
+        remove(child);
+      }
+    }
+  }
+
+  void destroyCardsScheduledForDestructionAfterCountdown(
+      int milliseconds) async {
+    await Future.delayed(Duration(milliseconds: milliseconds));
+    for (final child in children) {
+      if (child is Card && child.toBeDestroyed) {
+        remove(child);
+      }
+    }
+  }
+
+  void disablePlayerInput(int milliseconds) async {
+    var inputBarrier = DisableInputBarrier()..priority = 2000;
+    add(inputBarrier);
+    await Future.delayed(Duration(milliseconds: milliseconds));
+    inputBarrier.removeFromParent();
   }
 
   @override
@@ -319,4 +353,24 @@ class PlayCardArea extends PositionComponent with CollisionCallbacks {
   void render(Canvas canvas) {
     canvas.drawRect(size.toRect(), _paint);
   } */
+}
+
+class DisableInputBarrier extends PositionComponent with Draggable {
+  static final _paint = Paint()..color = Colors.transparent;
+  DisableInputBarrier() : super(size: Vector2(1920, 1080));
+  @override
+  FutureOr<void> onLoad() {
+    // TODO: implement onLoad
+    add(RectangleHitbox(size: size, isSolid: true)..renderShape = false);
+    return super.onLoad();
+  }
+
+  @override
+  void render(Canvas canvas) {
+    canvas.drawRect(size.toRect(), _paint);
+  }
+
+  bool onDragStart(DragStartInfo startPosition) {
+    return false;
+  }
 }

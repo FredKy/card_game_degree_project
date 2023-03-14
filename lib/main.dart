@@ -8,11 +8,13 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // This opens the app in fullscreen mode.
-  //await Flame.device.fullScreen();
+  await Flame.device.fullScreen();
 
-  SystemChrome.setPreferredOrientations([
+  await Flame.device.setLandscapeLeftOnly();
+
+  /* SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,
-  ]); //.then((value) => runApp(const MyApp()));
+  ]); */ //.then((value) => runApp(const MyApp()));
   //runApp(const MyApp());
   CardGame game = CardGame();
   runApp(GameWidget(game: game));
