@@ -23,33 +23,28 @@ class Player extends PositionComponent
   @override
   void render(Canvas canvas) {
     //canvas.drawRect(size.toRect(), _paint);
-    playerSprite.render(canvas,
+    /* playerSprite.render(canvas,
+        position: Vector2(size.x / 2, size.y / 2),
+        anchor: Anchor.center,
+        size: playerSprite.srcSize.scaled(4)); */
+    //_paint.color = _isDragged ? Colors.red : Colors.white;
+    //canvas.drawRect(size.toRect(), _paint);
+    idleAnimation.getSprite().render(canvas,
         position: Vector2(size.x / 2, size.y / 2),
         anchor: Anchor.center,
         size: playerSprite.srcSize.scaled(4));
-    //_paint.color = _isDragged ? Colors.red : Colors.white;
-    //canvas.drawRect(size.toRect(), _paint);
+  }
+
+  void update(double dt) {
+    idleAnimation.update(dt);
   }
 
   static late final Sprite playerSprite =
-      getPlayerSprite(32, 48, 128 - 2 * 32, 128, "idle");
-
-  /* bool _isDragged = false;
-
-  @override
-  void onDragStart(DragStartEvent event) => _isDragged = true;
-
-  @override
-  void onDragUpdate(DragUpdateEvent event) => position += event.delta;
-
-  @override
-  void onDragEnd(DragEndEvent event) => _isDragged = false; */
-  @override
-  void update(double dt) {
-    super.update(dt);
-    debugColor =
-        isDragged && parent is CardGame ? Colors.greenAccent : Colors.purple;
-  }
+      getPlayerSprite(256 + 32, 48, 128 - 2 * 32, 128, "idle");
+  static late final idleAnimation = SpriteAnimation.spriteList([
+    for (var i = 0; i < 8; i++)
+      getPlayerSprite(i * 128 + 32, 48, 128 - 2 * 32, 128, "idle")
+  ], stepTime: 0.125);
 
   @override
   bool onDragUpdate(DragUpdateInfo info) {

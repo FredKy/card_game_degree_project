@@ -46,6 +46,7 @@ class CardGame extends FlameGame
   double dealSpeed = 1;
   double dealInterval = 0.1;
   int turnStartDelayMS = 150;
+  final player = Player()..position = Vector2(1920 / 4, 1080 / 3);
 
   /*  @override
   Color backgroundColor() => const Color(0x00000000); */
@@ -92,7 +93,7 @@ class CardGame extends FlameGame
 
     //add(ScreenHitbox());
 
-    add(Player()..position = Vector2(size.x / 4, size.y / 3));
+    add(player);
 
     /* final random = Random();
     for (var i = 0; i < 7; i++) {
@@ -264,13 +265,6 @@ class CardGame extends FlameGame
     textConfig.render(canvas,
         'Elapsed time in milliseconds: $elapsedMilliseconds', Vector2(30, 130));
   }
-
-  /* @override
-  void onTapDown(event) {
-    super.onTapDown(event);
-    //add(MyCollidable(event.eventPosition.game));
-    add(MyCollidable(Vector2(500, 500)));
-  } */
 }
 
 void addDealEffects(
