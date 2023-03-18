@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:card_game_degree_project/game/my_button.dart';
+import 'package:card_game_degree_project/game/deal_button.dart';
+import 'package:card_game_degree_project/game/reshuffle_button.dart';
 import 'package:card_game_degree_project/game/player.dart';
 import 'package:card_game_degree_project/models/deck.dart';
 import 'package:card_game_degree_project/models/discard_pile.dart';
@@ -41,16 +42,16 @@ class CardGame extends FlameGame
   //List<CardName> cardsToDeal = [];
   List<Card> hand = [];
   Deck playerDeck = Deck(cardList: [
-    /* CardName.icecannon,
-    CardName.coldtouch,
-    CardName.warptime,
-    CardName.icecannon,
     CardName.icecannon,
     CardName.coldtouch,
     CardName.warptime,
     CardName.icecannon,
     CardName.icecannon,
-    CardName.coldtouch, */
+    CardName.coldtouch,
+    CardName.warptime,
+    CardName.icecannon,
+    CardName.icecannon,
+    CardName.coldtouch,
   ]);
   DiscardPile discardPile = DiscardPile(cardList: [
     CardName.icecannon,
@@ -113,29 +114,18 @@ class CardGame extends FlameGame
 
     add(player);
 
-    /* final random = Random();
-    for (var i = 0; i < 7; i++) {
-      for (var j = 0; j < 4; j++) {
-        final card = Card(id: i * j)
-          ..position = Vector2(100 + i * 1150, 100 + j * 1500)
-          ..addToParent(world);
-        if (random.nextDouble() < 0.9) {
-          // flip face up with 90% probability
-          card.flip();
-        }
-      }
-    } */
     playerDeck.shuffle();
     playerDeck.priority = 100;
     add(playerDeck);
     add(discardPile);
-    dealCards(cardsToDeal: getCardsToDealFromDeck(0));
+    dealCards(cardsToDeal: getCardsToDealFromDeck(7));
 
     add(PlayCardArea()
       ..width = size.x
       ..height = size.y / 3.5);
 
-    add(MyButton()..position = Vector2(1500, 300));
+    add(ReshuffleButton()..position = Vector2(1800, 300));
+    add(DealButton()..position = Vector2(1800, 200));
   }
 
   List<CardName> getCardsToDealFromDeck(int n) {
@@ -191,22 +181,29 @@ class CardGame extends FlameGame
     }
   }
 
-  void moveCardsFromDiscardPileToDeck() {
+  void moveCardsFromDiscardPileToDeck() async {
     List<Card> flyingCards = [];
     discardPile.shuffle();
+    var c = 5;
     final numberOfCards = discardPile.numberOfCards();
     for (var i = 0; i < numberOfCards; i++) {
       flyingCards.add(Card.create(discardPile.removeCardFromTop())
         ..scale = Vector2.all(0.3)
         ..position = discardPilePosition
         ..canBeMoved = false
-        ..priority = 5);
+        ..priority = 5
+        ..toBeDestroyed);
       addFlyingCardEffects(
-          startDelay: i * dealInterval,
+          startDelay: c * i * dealInterval / numberOfCards,
           card: flyingCards[i],
           dealSpeed: dealSpeed,
           moveToPosition: deckPosition);
       add(flyingCards[i]);
+    }
+    await Future.delayed(Duration(
+        milliseconds: (dealSpeed * 1000 + c * dealInterval + 300).toInt()));
+    for (var card in flyingCards) {
+      card.removeFromParent();
     }
     //for (var i = 0; i < flyingCards.length; i++) {}
   }
@@ -216,23 +213,6 @@ class CardGame extends FlameGame
       required double dealSpeed,
       required Vector2 moveToPosition,
       required double startDelay}) {
-    card.scale = Vector2(0.3, 0.3);
-    /* card.add(MoveByEffect(
-        Vector2(0, -300),
-        EffectController(
-            startDelay: startDelay,
-            duration: dealSpeed * 0.5,
-            curve: Curves.ease)));
-    card.add(
-      MoveEffect.to(
-        Vector2(moveToPosition.x, -300),
-        EffectController(
-          startDelay: 0.5 + startDelay,
-          duration: dealSpeed,
-          curve: Curves.linear,
-        ),
-      ),
-    ); */
     var displacement = deckPosition - discardPilePosition;
     Path path = Path();
     path.lineTo(displacement.x, displacement.y);
@@ -240,7 +220,6 @@ class CardGame extends FlameGame
     card.add(MoveAlongPathEffect(path, onComplete: () {
       CardName cardName = cardNameFromId(card);
       playerDeck.addCardToTop(cardName);
-      removeFromParent();
     },
         EffectController(
             startDelay: startDelay, duration: dealSpeed, curve: Curves.ease)));

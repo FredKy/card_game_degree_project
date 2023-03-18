@@ -6,9 +6,9 @@ import 'package:flame/experimental.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
 
-class MyButton extends PositionComponent
+class ReshuffleButton extends PositionComponent
     with Tappable, HasGameReference<CardGame> {
-  MyButton() : super(size: Vector2(50, 50), anchor: Anchor.center);
+  ReshuffleButton() : super(size: Vector2(50, 50), anchor: Anchor.center);
   @override
   bool onTapDown(TapDownInfo info) {
     print("tap down");
