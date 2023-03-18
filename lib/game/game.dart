@@ -118,7 +118,7 @@ class CardGame extends FlameGame
     add(playerDeck..priority = 500);
     add(discardPile..priority = 500);
 
-    dealCardsWhenHandEmpty(2);
+    dealCards(2);
 
     add(PlayCardArea()
       ..width = size.x
@@ -153,52 +153,11 @@ class CardGame extends FlameGame
     return cardsToDeal;
   }
 
-  void dealCardsWhenHandEmpty(int n) async {
-    var cardsToDeal = await getCardsToDealFromDeck(n);
-    double y = 850;
-    disablePlayerInput((dealSpeed * 1000 + cardsToDeal.length * 100).toInt());
-    if (cardsToDeal.length == 1) {
-      hand.add(Card.create(cardsToDeal[0])
-        ..dragStartingPosition = Vector2(size.x / 2, y)
-        ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
-        ..position = deckPosition
-        ..priority = hand.length + 1
-        ..handPosition = 0);
-      addDealEffects(
-          startDelay: 0,
-          card: hand[hand.length - 1],
-          dealSpeed: dealSpeed,
-          moveToPosition: Vector2(size.x / 2, y));
-      add(hand[hand.length - 1]);
-    } else if (cardsToDeal.length > 1) {
-      var padding =
-          (cardsToDeal.length > 5) ? 320 : 320 + 100 * (5 - cardsToDeal.length);
-      var gap = (size.x - 2 * padding) / (cardsToDeal.length - 1);
-      for (var i = 0; i < cardsToDeal.length; i++) {
-        hand.add(Card.create(cardsToDeal[i])
-          ..dragStartingPosition = Vector2(padding + gap * i, y)
-          ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
-          ..position = deckPosition
-          ..priority = i + 1
-          ..handPosition = i);
-        addDealEffects(
-            startDelay: i * dealInterval,
-            card: hand[i],
-            dealSpeed: dealSpeed,
-            moveToPosition: Vector2(padding + gap * i, y));
-        add(hand[i]);
-        print(hand);
-        /* hand.clear();
-        print(hand); */
-      }
-    }
-    print("Hand after deal " + hand.toString());
-  }
-
-  void dealCardsWhenHandNotEmpty(int n) async {
+  void dealCards(int n) async {
     //List<Vector2> openPositions = getOpenPositions(n);
     List<Vector2> openPositions = getOpenPositions(n);
     var cardsToDeal = await getCardsToDealFromDeck(n);
+    if (cardsToDeal.isEmpty) return;
     //moveCardsToMakeSpace(n);
     disablePlayerInput((dealSpeed * 1000 + cardsToDeal.length * 100).toInt());
     print(hand);
@@ -341,8 +300,9 @@ class CardGame extends FlameGame
     }
   }
 
+  //Twin function of getOpenPositions
   void moveCardsToMakeSpace(int oldCards) {
-    assert(oldCards > 0);
+    if (oldCards < 1) return;
     double y = 850;
     //var count = 0;
     List<Card> hand = [];
@@ -364,6 +324,7 @@ class CardGame extends FlameGame
     }
   }
 
+  //Twin function of moveCardsToMakeSpace
   List<Vector2> getOpenPositions(int n) {
     assert(n > 0);
     List<Vector2> openCardPositions = [];

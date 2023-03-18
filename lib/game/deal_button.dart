@@ -15,7 +15,7 @@ class DealButton extends PositionComponent
     //game.moveCardsFromDiscardPileToDeck();
 
     if (game.hand.isEmpty) {
-      game.dealCardsWhenHandEmpty(2);
+      game.dealCards(2);
     } else {
       print("Hand not empty.");
     }

@@ -15,7 +15,7 @@ class MiscButton extends PositionComponent
 
     //game.moveCardsToMakeSpace(2);
     //game.dealCardsWhenHandNotEmpty(openPositions: game.moveCardsToMakeSpace(2));
-    game.dealCardsWhenHandNotEmpty(2);
+    game.dealCards(2);
 
     return true;
   }
