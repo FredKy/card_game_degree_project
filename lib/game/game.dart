@@ -196,12 +196,18 @@ class CardGame extends FlameGame
   }
 
   void dealCardsWhenHandNotEmpty(int n) async {
+    //List<Vector2> openPositions = getOpenPositions(n);
     List<Vector2> openPositions = getOpenPositions(n);
-    var cardsToDeal = await getCardsToDealFromDeck(openPositions.length);
+    var cardsToDeal = await getCardsToDealFromDeck(n);
+    //moveCardsToMakeSpace(n);
     disablePlayerInput((dealSpeed * 1000 + cardsToDeal.length * 100).toInt());
     print(hand);
     var prevHandLength = hand.length;
+
+    moveCardsToMakeSpace(prevHandLength);
+
     for (var i = 0; i < cardsToDeal.length; i++) {
+      print(openPositions[i]);
       hand.add(Card.create(cardsToDeal[i])
         ..dragStartingPosition = openPositions[i]
         ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
@@ -335,9 +341,8 @@ class CardGame extends FlameGame
     }
   }
 
-  List<Vector2> moveCardsToMakeSpace(int numberOfExtraCards) {
-    assert(numberOfExtraCards > 0);
-    List<Vector2> openCardPositions = [];
+  void moveCardsToMakeSpace(int oldCards) {
+    assert(oldCards > 0);
     double y = 850;
     //var count = 0;
     List<Card> hand = [];
@@ -348,26 +353,15 @@ class CardGame extends FlameGame
         if (!child.hasBeenPlayed) hand.add(child);
       }
     }
-
-    var newHandLength = hand.length + numberOfExtraCards;
-    if (newHandLength > 1) {
-      var padding = (newHandLength > 5) ? 320 : 320 + 100 * (5 - newHandLength);
-      var gap = (size.x - 2 * padding) / (newHandLength - 1);
-      for (var i = 0; i < hand.length; i++) {
-        hand[i].dragStartingPosition = Vector2(padding + gap * i, y);
-        hand[i].add(MoveEffect.to(
-          Vector2(padding + gap * i, y),
-          EffectController(
-            duration: dealSpeed,
-            curve: Curves.easeOutCirc,
-          ),
-        ));
-      }
-      for (var i = hand.length; i < newHandLength; i++) {
-        openCardPositions.add(Vector2(padding + gap * i, y));
-      }
+    for (var i = 0; i < oldCards; i++) {
+      hand[i].add(MoveEffect.to(
+        hand[i].dragStartingPosition!,
+        EffectController(
+          duration: dealSpeed,
+          curve: Curves.easeOutCirc,
+        ),
+      ));
     }
-    return openCardPositions;
   }
 
   List<Vector2> getOpenPositions(int n) {
@@ -390,13 +384,6 @@ class CardGame extends FlameGame
       var gap = (size.x - 2 * padding) / (newHandLength - 1);
       for (var i = 0; i < hand.length; i++) {
         hand[i].dragStartingPosition = Vector2(padding + gap * i, y);
-        hand[i].add(MoveEffect.to(
-          Vector2(padding + gap * i, y),
-          EffectController(
-            duration: dealSpeed,
-            curve: Curves.easeOutCirc,
-          ),
-        ));
       }
       for (var i = hand.length; i < newHandLength; i++) {
         openCardPositions.add(Vector2(padding + gap * i, y));
