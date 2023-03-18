@@ -59,8 +59,7 @@ class CardGame extends FlameGame
     CardName.warptime,
     CardName.icecannon,
     CardName.icecannon,
-  ])
-    ..priority = 100;
+  ]);
   bool animated = true;
   double dealSpeed = 1;
   double dealInterval = 0.1;
@@ -116,15 +115,15 @@ class CardGame extends FlameGame
 
     playerDeck.shuffle();
     add(playerDeck..priority = 500);
-    add(discardPile);
+    add(discardPile..priority = 500);
     dealCards(cardsToDeal: getCardsToDealFromDeck(3));
 
     add(PlayCardArea()
       ..width = size.x
       ..height = size.y / 3.5);
 
-    add(ReshuffleButton()..position = Vector2(1800, 300));
-    add(DealButton()..position = Vector2(1800, 200));
+    add(ReshuffleButton()..position = Vector2(1800, 100));
+    add(DealButton()..position = Vector2(1700, 100));
   }
 
   List<CardName> getCardsToDealFromDeck(int n) {
@@ -194,10 +193,11 @@ class CardGame extends FlameGame
           card: flyingCards[i],
           dealSpeed: dealSpeed,
           moveToPosition: deckPosition);
-      add(flyingCards[i]);
+      add(flyingCards[i]..priority = 4);
     }
     print(flyingCards);
     flyingCards.forEach((element) {
+      element.priority = 5;
       print(element.priority);
     });
     await Future.delayed(Duration(
@@ -229,7 +229,7 @@ class CardGame extends FlameGame
         EffectController(
             startDelay: startDelay, duration: dealSpeed, curve: Curves.ease)));
 
-    /* card.add(MoveByEffect(
+    card.add(MoveByEffect(
         Vector2(0, -500),
         EffectController(
             startDelay: startDelay,
@@ -245,7 +245,7 @@ class CardGame extends FlameGame
           curve: Curves.ease,
         ),
       ),
-    ); */
+    );
     /* card.add(ScaleEffect.to(
         Vector2.all(0.3),
         EffectController(
