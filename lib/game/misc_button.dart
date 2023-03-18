@@ -6,20 +6,16 @@ import 'package:flame/experimental.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
 
-class DealButton extends PositionComponent
+class MiscButton extends PositionComponent
     with Tappable, HasGameReference<CardGame> {
-  DealButton() : super(size: Vector2(50, 50), anchor: Anchor.center);
+  MiscButton() : super(size: Vector2(50, 50), anchor: Anchor.center);
   @override
   bool onTapDown(TapDownInfo info) {
     print("tap down");
-    //game.moveCardsFromDiscardPileToDeck();
 
-    if (game.hand.isEmpty) {
-      game.dealCardsWhenHandEmpty(cardsToDeal: game.getCardsToDealFromDeck(3));
-    } else {
-      print("Hand not empty.");
-    }
-    print(game.hand);
+    //game.moveCardsToMakeSpace(2);
+    game.dealCardsWhenHandNotEmpty(openPositions: game.moveCardsToMakeSpace(2));
+
     return true;
   }
 
@@ -28,6 +24,6 @@ class DealButton extends PositionComponent
     // TODO: implement render
     super.render(canvas);
     canvas.drawRect(
-        size.toRect(), Paint()..color = Color.fromARGB(255, 232, 76, 76));
+        size.toRect(), Paint()..color = Color.fromARGB(255, 210, 203, 14));
   }
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:card_game_degree_project/game/deal_button.dart';
+import 'package:card_game_degree_project/game/misc_button.dart';
 import 'package:card_game_degree_project/game/reshuffle_button.dart';
 import 'package:card_game_degree_project/game/player.dart';
 import 'package:card_game_degree_project/models/deck.dart';
@@ -116,7 +117,7 @@ class CardGame extends FlameGame
     playerDeck.shuffle();
     add(playerDeck..priority = 500);
     add(discardPile..priority = 500);
-    dealCards(cardsToDeal: getCardsToDealFromDeck(3));
+    dealCardsWhenHandEmpty(cardsToDeal: getCardsToDealFromDeck(5));
 
     add(PlayCardArea()
       ..width = size.x
@@ -124,6 +125,7 @@ class CardGame extends FlameGame
 
     add(ReshuffleButton()..position = Vector2(1800, 100));
     add(DealButton()..position = Vector2(1700, 100));
+    add(MiscButton()..position = Vector2(1600, 100));
   }
 
   List<CardName> getCardsToDealFromDeck(int n) {
@@ -136,7 +138,7 @@ class CardGame extends FlameGame
     return cardsToDeal;
   }
 
-  void dealCards({required List<CardName> cardsToDeal}) {
+  void dealCardsWhenHandEmpty({required List<CardName> cardsToDeal}) {
     double y = 850;
     disablePlayerInput((dealSpeed * 1000 + cardsToDeal.length * 100).toInt());
     if (cardsToDeal.length == 1) {
@@ -175,6 +177,28 @@ class CardGame extends FlameGame
       }
     }
     print("Hand after deal " + hand.toString());
+  }
+
+  void dealCardsWhenHandNotEmpty({required List<Vector2> openPositions}) {
+    var cardsToDeal = getCardsToDealFromDeck(openPositions.length);
+    disablePlayerInput((dealSpeed * 1000 + cardsToDeal.length * 100).toInt());
+    print(hand);
+    var prevHandLength = hand.length;
+    for (var i = 0; i < cardsToDeal.length; i++) {
+      hand.add(Card.create(cardsToDeal[i])
+        ..dragStartingPosition = openPositions[i]
+        ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
+        ..position = deckPosition
+        ..priority = prevHandLength + i + 1
+        ..handPosition = i);
+      addDealEffects(
+          startDelay: i * dealInterval,
+          card: hand[prevHandLength + i],
+          dealSpeed: dealSpeed,
+          moveToPosition: openPositions[i]);
+      add(hand[prevHandLength + i]);
+      print(hand);
+    }
   }
 
   void moveCardsFromDiscardPileToDeck() async {
@@ -280,11 +304,11 @@ class CardGame extends FlameGame
       ));
     } else if (hand.length > 1) {
       var padding = (hand.length > 5) ? 320 : 320 + 100 * (5 - hand.length);
-      var space = (size.x - 2 * padding) / (hand.length - 1);
+      var gap = (size.x - 2 * padding) / (hand.length - 1);
       for (var i = 0; i < hand.length; i++) {
-        hand[i].dragStartingPosition = Vector2(padding + space * i, y);
+        hand[i].dragStartingPosition = Vector2(padding + gap * i, y);
         hand[i].add(MoveEffect.to(
-          Vector2(padding + space * i, y),
+          Vector2(padding + gap * i, y),
           EffectController(
             duration: dealSpeed,
             curve: Curves.easeOutCirc,
@@ -292,6 +316,41 @@ class CardGame extends FlameGame
         ));
       }
     }
+  }
+
+  List<Vector2> moveCardsToMakeSpace(int numberOfExtraCards) {
+    assert(numberOfExtraCards > 0);
+    List<Vector2> openCardPositions = [];
+    double y = 850;
+    //var count = 0;
+    List<Card> hand = [];
+    for (final child in children) {
+      if (child is Card) {
+        //count += 1;
+        child.canBeMoved = false;
+        if (!child.hasBeenPlayed) hand.add(child);
+      }
+    }
+
+    var newHandLength = hand.length + numberOfExtraCards;
+    if (newHandLength > 1) {
+      var padding = (newHandLength > 5) ? 320 : 320 + 100 * (5 - newHandLength);
+      var gap = (size.x - 2 * padding) / (newHandLength - 1);
+      for (var i = 0; i < hand.length; i++) {
+        hand[i].dragStartingPosition = Vector2(padding + gap * i, y);
+        hand[i].add(MoveEffect.to(
+          Vector2(padding + gap * i, y),
+          EffectController(
+            duration: dealSpeed,
+            curve: Curves.easeOutCirc,
+          ),
+        ));
+      }
+      for (var i = hand.length; i < newHandLength; i++) {
+        openCardPositions.add(Vector2(padding + gap * i, y));
+      }
+    }
+    return openCardPositions;
   }
 
   void activateCards() {
