@@ -28,8 +28,16 @@ class DiscardPile extends PositionComponent {
     return cardList.removeLast();
   }
 
+  CardName removeCardFromBottom() {
+    return cardList.removeAt(0);
+  }
+
   void shuffle() {
     cardList.shuffle();
+  }
+
+  int numberOfCards() {
+    return cardList.length;
   }
 
   @override

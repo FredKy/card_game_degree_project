@@ -13,24 +13,7 @@ import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 
 import '../game/utils.dart' as utils;
-
-final nameTextPaint = TextPaint(
-    style: TextStyle(
-        color: const Color.fromARGB(255, 231, 231, 231),
-        fontSize: 30,
-        fontFamily: 'Yoster',
-        shadows: utils.getShadows(2)));
-final costTextPaint = TextPaint(
-    style: const TextStyle(
-        color: Color.fromARGB(255, 46, 46, 46),
-        fontSize: 50,
-        fontFamily: 'Yoster'));
-final descriptionTextPaint = TextPaint(
-    style: TextStyle(
-        color: const Color.fromARGB(255, 231, 231, 231),
-        fontSize: 25,
-        fontFamily: 'Yoster',
-        shadows: utils.getShadows(2)));
+import '../game/paints.dart' as paints;
 
 class Card extends PositionComponent
     with Draggable, CollisionCallbacks, HasPaint, HasGameReference<CardGame> {
@@ -198,7 +181,7 @@ class Card extends PositionComponent
     if (_faceUp) {
       cardNameText
         ..text = name
-        ..textRenderer = nameTextPaint
+        ..textRenderer = paints.nameTextPaint
         ..anchor = Anchor.center
         ..position = Vector2(size.x / 2, 28);
       add(cardNameText);
@@ -238,14 +221,6 @@ class Card extends PositionComponent
     return false;
   }
 
-  /* @override
-  void onDragStart(DragStartEvent event) {
-    if (canBeMoved) {
-      _isDragging = true;
-      priority = 100;
-    }
-  } */
-
   @override
   bool onDragUpdate(DragUpdateInfo event) {
     if (canBeMoved) {
@@ -256,17 +231,6 @@ class Card extends PositionComponent
     }
     return false;
   }
-
-  /* @override
-  void onDragUpdate(DragUpdateEvent event) {
-    if (canBeMoved) {
-      if (!_isDragging) {
-        return;
-      }
-      final delta = event.delta;
-      position.add(delta);
-    }
-  } */
 
   @override
   bool onDragEnd(DragEndInfo event) {
@@ -301,7 +265,7 @@ class Card extends PositionComponent
               reverseDuration: duration / 2,
               curve: Curves.ease)));
       add(RotateEffect.by(
-        -(8 / 4) * pi,
+        (8 / 4) * pi,
         EffectController(
           duration: duration * 0.8,
           curve: Curves.ease,
@@ -485,7 +449,7 @@ class CostField extends PositionComponent {
     super.onLoad();
     _costText
       ..text = _cost
-      ..textRenderer = costTextPaint
+      ..textRenderer = paints.costTextPaint
       ..anchor = Anchor.center
       ..position = Vector2(25, 25);
     add(_costText);
@@ -522,7 +486,7 @@ class DescriptionField extends PositionComponent {
     super.onLoad();
     _descriptionText
       ..text = _description
-      ..textRenderer = descriptionTextPaint
+      ..textRenderer = paints.descriptionTextPaint
       ..anchor = Anchor.center
       ..position = Vector2(size.x / 2, size.y / 2);
     add(_descriptionText);
