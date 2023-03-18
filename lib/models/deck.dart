@@ -22,6 +22,10 @@ class Deck extends PositionComponent {
     cardList.add(cardName);
   }
 
+  void addCardToBottom(CardName cardName) {
+    cardList.insert(0, cardName);
+  }
+
   CardName removeCardFromTop() {
     return cardList.removeLast();
   }

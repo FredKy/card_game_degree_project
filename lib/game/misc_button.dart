@@ -14,7 +14,8 @@ class MiscButton extends PositionComponent
     print("tap down");
 
     //game.moveCardsToMakeSpace(2);
-    game.dealCardsWhenHandNotEmpty(openPositions: game.moveCardsToMakeSpace(2));
+    //game.dealCardsWhenHandNotEmpty(openPositions: game.moveCardsToMakeSpace(2));
+    game.dealCardsWhenHandNotEmpty(2);
 
     return true;
   }

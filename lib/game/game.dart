@@ -47,12 +47,12 @@ class CardGame extends FlameGame
     CardName.coldtouch,
     CardName.warptime,
     CardName.icecannon,
-    CardName.icecannon,
+/*     CardName.icecannon,
     CardName.coldtouch,
     CardName.warptime,
     CardName.icecannon,
     CardName.icecannon,
-    CardName.coldtouch,
+    CardName.coldtouch, */
   ]);
   DiscardPile discardPile = DiscardPile(cardList: [
     CardName.icecannon,
@@ -117,7 +117,8 @@ class CardGame extends FlameGame
     playerDeck.shuffle();
     add(playerDeck..priority = 500);
     add(discardPile..priority = 500);
-    dealCardsWhenHandEmpty(cardsToDeal: getCardsToDealFromDeck(5));
+
+    dealCardsWhenHandEmpty(2);
 
     add(PlayCardArea()
       ..width = size.x
@@ -128,17 +129,32 @@ class CardGame extends FlameGame
     add(MiscButton()..position = Vector2(1600, 100));
   }
 
-  List<CardName> getCardsToDealFromDeck(int n) {
+  Future<List<CardName>> getCardsToDealFromDeck(int n) async {
     List<CardName> cardsToDeal = [];
     if (playerDeck.cardList.length >= n) {
       for (var i = 0; i < n; i++) {
         cardsToDeal.add(playerDeck.removeCardFromTop());
       }
+    } else {
+      if (discardPile.cardList.isNotEmpty) {
+        moveCardsFromDiscardPileToDeck();
+        await Future.delayed(Duration(
+            milliseconds: (dealSpeed * 1000 + 5 * dealInterval + 300).toInt()));
+        for (var i = 0; i < n; i++) {
+          cardsToDeal.add(playerDeck.removeCardFromTop());
+        }
+      } else {
+        for (var i = 0; i < playerDeck.cardList.length; i++) {
+          cardsToDeal.add(playerDeck.removeCardFromTop());
+        }
+      }
     }
+
     return cardsToDeal;
   }
 
-  void dealCardsWhenHandEmpty({required List<CardName> cardsToDeal}) {
+  void dealCardsWhenHandEmpty(int n) async {
+    var cardsToDeal = await getCardsToDealFromDeck(n);
     double y = 850;
     disablePlayerInput((dealSpeed * 1000 + cardsToDeal.length * 100).toInt());
     if (cardsToDeal.length == 1) {
@@ -179,8 +195,9 @@ class CardGame extends FlameGame
     print("Hand after deal " + hand.toString());
   }
 
-  void dealCardsWhenHandNotEmpty({required List<Vector2> openPositions}) {
-    var cardsToDeal = getCardsToDealFromDeck(openPositions.length);
+  void dealCardsWhenHandNotEmpty(int n) async {
+    List<Vector2> openPositions = getOpenPositions(n);
+    var cardsToDeal = await getCardsToDealFromDeck(openPositions.length);
     disablePlayerInput((dealSpeed * 1000 + cardsToDeal.length * 100).toInt());
     print(hand);
     var prevHandLength = hand.length;
@@ -197,7 +214,7 @@ class CardGame extends FlameGame
           dealSpeed: dealSpeed,
           moveToPosition: openPositions[i]);
       add(hand[prevHandLength + i]);
-      print(hand);
+      print("Current hand: " + hand.toString());
     }
   }
 
@@ -229,7 +246,7 @@ class CardGame extends FlameGame
         milliseconds: (dealSpeed * 1000 + c * dealInterval + 300).toInt()));
     for (var card in flyingCards) {
       CardName cardName = cardNameFromId(card);
-      playerDeck.addCardToTop(cardName);
+      playerDeck.addCardToBottom(cardName);
       card.removeFromParent();
     }
     print(flyingCards);
@@ -333,6 +350,41 @@ class CardGame extends FlameGame
     }
 
     var newHandLength = hand.length + numberOfExtraCards;
+    if (newHandLength > 1) {
+      var padding = (newHandLength > 5) ? 320 : 320 + 100 * (5 - newHandLength);
+      var gap = (size.x - 2 * padding) / (newHandLength - 1);
+      for (var i = 0; i < hand.length; i++) {
+        hand[i].dragStartingPosition = Vector2(padding + gap * i, y);
+        hand[i].add(MoveEffect.to(
+          Vector2(padding + gap * i, y),
+          EffectController(
+            duration: dealSpeed,
+            curve: Curves.easeOutCirc,
+          ),
+        ));
+      }
+      for (var i = hand.length; i < newHandLength; i++) {
+        openCardPositions.add(Vector2(padding + gap * i, y));
+      }
+    }
+    return openCardPositions;
+  }
+
+  List<Vector2> getOpenPositions(int n) {
+    assert(n > 0);
+    List<Vector2> openCardPositions = [];
+    double y = 850;
+    //var count = 0;
+    List<Card> hand = [];
+    for (final child in children) {
+      if (child is Card) {
+        //count += 1;
+        child.canBeMoved = false;
+        if (!child.hasBeenPlayed) hand.add(child);
+      }
+    }
+
+    var newHandLength = hand.length + n;
     if (newHandLength > 1) {
       var padding = (newHandLength > 5) ? 320 : 320 + 100 * (5 - newHandLength);
       var gap = (size.x - 2 * padding) / (newHandLength - 1);
