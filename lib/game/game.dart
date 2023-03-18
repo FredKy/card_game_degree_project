@@ -155,10 +155,10 @@ class CardGame extends FlameGame
     } else if (cardsToDeal.length > 1) {
       var padding =
           (cardsToDeal.length > 5) ? 320 : 320 + 100 * (5 - cardsToDeal.length);
-      var space = (size.x - 2 * padding) / (cardsToDeal.length - 1);
+      var gap = (size.x - 2 * padding) / (cardsToDeal.length - 1);
       for (var i = 0; i < cardsToDeal.length; i++) {
         hand.add(Card.create(cardsToDeal[i])
-          ..dragStartingPosition = Vector2(padding + space * i, y)
+          ..dragStartingPosition = Vector2(padding + gap * i, y)
           ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
           ..position = deckPosition
           ..priority = i + 1
@@ -167,7 +167,7 @@ class CardGame extends FlameGame
             startDelay: i * dealInterval,
             card: hand[i],
             dealSpeed: dealSpeed,
-            moveToPosition: Vector2(padding + space * i, y));
+            moveToPosition: Vector2(padding + gap * i, y));
         add(hand[i]);
         print(hand);
         /* hand.clear();
@@ -186,17 +186,18 @@ class CardGame extends FlameGame
       flyingCards.add(Card.create(discardPile.removeCardFromTop())
         ..scale = Vector2.all(0.3)
         ..position = discardPilePosition
-        ..canBeMoved = false
-        ..priority = 5);
+        ..canBeMoved = false);
       addFlyingCardEffects(
           startDelay: c * i * dealInterval / numberOfCards,
           card: flyingCards[i],
           dealSpeed: dealSpeed,
           moveToPosition: deckPosition);
+      //Om priority sätts till 5 här så uppstår en bugg av någon anledning,
       add(flyingCards[i]..priority = 4);
     }
     print(flyingCards);
     flyingCards.forEach((element) {
+      //Denna priority får alltså inte vara samma som föregående priority.
       element.priority = 5;
       print(element.priority);
     });
@@ -212,7 +213,7 @@ class CardGame extends FlameGame
       print(element.priority);
     });
     flyingCards.clear();
-    //for (var i = 0; i < flyingCards.length; i++) {}
+    print(flyingCards);
   }
 
   void addFlyingCardEffects(
