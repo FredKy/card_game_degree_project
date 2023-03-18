@@ -80,7 +80,7 @@ class Card extends PositionComponent
   }
 
   @override
-  String toString() => "Test";
+  String toString() => name;
 
   @override
   void render(Canvas canvas) {
@@ -208,6 +208,8 @@ class Card extends PositionComponent
     }
   }
 
+  //START Drag functions
+
   Vector2? dragDeltaPosition;
   bool get isDragging => dragDeltaPosition != null;
 
@@ -323,7 +325,9 @@ class Card extends PositionComponent
     return false;
   }
 
-  //Collision
+  //END Drag functions
+
+  //START Collision
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
@@ -341,6 +345,8 @@ class Card extends PositionComponent
     frontBorderPaint.color = _defaultBorderColor;
     _isInPlayCardArea = false;
   }
+
+  //END Collision
 
   void destroy() {
     removeFromParent();

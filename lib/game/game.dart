@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:card_game_degree_project/game/my_button.dart';
 import 'package:card_game_degree_project/game/player.dart';
 import 'package:card_game_degree_project/models/deck.dart';
 import 'package:card_game_degree_project/models/discard_pile.dart';
@@ -10,6 +11,7 @@ import 'package:flame/experimental.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
+import 'package:flame/widgets.dart';
 import 'package:flutter/material.dart' hide Card, Image, Draggable;
 import 'package:flame/collisions.dart';
 
@@ -18,7 +20,11 @@ import '../models/card.dart';
 const String spriteSheetPath = 'aeromancer_spritesheet_pixelated.png';
 
 class CardGame extends FlameGame
-    with HasTappableComponents, HasDraggables, HasCollisionDetection {
+    with
+        HasTappableComponents,
+        HasDraggables,
+        HasCollisionDetection,
+        HasTappablesBridge {
   static const double cardWidth = 300.0;
   static const double cardHeight = 420.0;
   static const double cardGap = 175.0;
@@ -35,7 +41,7 @@ class CardGame extends FlameGame
   //List<CardName> cardsToDeal = [];
   List<Card> hand = [];
   Deck playerDeck = Deck(cardList: [
-    CardName.icecannon,
+    /* CardName.icecannon,
     CardName.coldtouch,
     CardName.warptime,
     CardName.icecannon,
@@ -44,9 +50,13 @@ class CardGame extends FlameGame
     CardName.warptime,
     CardName.icecannon,
     CardName.icecannon,
-    CardName.coldtouch,
+    CardName.coldtouch, */
   ]);
   DiscardPile discardPile = DiscardPile(cardList: [
+    CardName.icecannon,
+    CardName.coldtouch,
+    CardName.warptime,
+    CardName.icecannon,
     CardName.icecannon,
   ])
     ..priority = 100;
@@ -119,11 +129,13 @@ class CardGame extends FlameGame
     playerDeck.priority = 100;
     add(playerDeck);
     add(discardPile);
-    dealCards(cardsToDeal: getCardsToDealFromDeck(7));
+    dealCards(cardsToDeal: getCardsToDealFromDeck(0));
 
     add(PlayCardArea()
       ..width = size.x
       ..height = size.y / 3.5);
+
+    add(MyButton()..position = Vector2(1500, 300));
   }
 
   List<CardName> getCardsToDealFromDeck(int n) {
@@ -179,12 +191,85 @@ class CardGame extends FlameGame
     }
   }
 
-  void addCardsFromDiscardPileToDeck() {
-    var flyingCards = [];
+  void moveCardsFromDiscardPileToDeck() {
+    List<Card> flyingCards = [];
     discardPile.shuffle();
-    for (var i = 0; i < discardPile.numberOfCards(); i++) {
-      
+    final numberOfCards = discardPile.numberOfCards();
+    for (var i = 0; i < numberOfCards; i++) {
+      flyingCards.add(Card.create(discardPile.removeCardFromTop())
+        ..scale = Vector2.all(0.3)
+        ..position = discardPilePosition
+        ..canBeMoved = false
+        ..priority = 5);
+      addFlyingCardEffects(
+          startDelay: i * dealInterval,
+          card: flyingCards[i],
+          dealSpeed: dealSpeed,
+          moveToPosition: deckPosition);
+      add(flyingCards[i]);
     }
+    //for (var i = 0; i < flyingCards.length; i++) {}
+  }
+
+  void addFlyingCardEffects(
+      {required Card card,
+      required double dealSpeed,
+      required Vector2 moveToPosition,
+      required double startDelay}) {
+    card.scale = Vector2(0.3, 0.3);
+    /* card.add(MoveByEffect(
+        Vector2(0, -300),
+        EffectController(
+            startDelay: startDelay,
+            duration: dealSpeed * 0.5,
+            curve: Curves.ease)));
+    card.add(
+      MoveEffect.to(
+        Vector2(moveToPosition.x, -300),
+        EffectController(
+          startDelay: 0.5 + startDelay,
+          duration: dealSpeed,
+          curve: Curves.linear,
+        ),
+      ),
+    ); */
+    var displacement = deckPosition - discardPilePosition;
+    Path path = Path();
+    path.lineTo(displacement.x, displacement.y);
+    //path.close();
+    card.add(MoveAlongPathEffect(path, onComplete: () {
+      CardName cardName = cardNameFromId(card);
+      playerDeck.addCardToTop(cardName);
+      removeFromParent();
+    },
+        EffectController(
+            startDelay: startDelay, duration: dealSpeed, curve: Curves.ease)));
+
+    card.add(MoveByEffect(
+        Vector2(0, -500),
+        EffectController(
+            startDelay: startDelay,
+            duration: dealSpeed * 0.5,
+            reverseDuration: dealSpeed * 0.5,
+            curve: Curves.ease)));
+    card.add(
+      RotateEffect.by(
+        -4.0 * pi,
+        EffectController(
+          startDelay: startDelay,
+          duration: dealSpeed * 0.6,
+          curve: Curves.ease,
+        ),
+      ),
+    );
+    /* card.add(ScaleEffect.to(
+        Vector2.all(0.3),
+        EffectController(
+          startDelay: startDelay,
+          duration: dealSpeed * 0.6,
+          //reverseDuration: 0.15,
+          curve: Curves.ease,
+        ))); */
   }
 
   void moveCards() {
@@ -251,17 +336,22 @@ class CardGame extends FlameGame
     await Future.delayed(Duration(milliseconds: milliseconds));
     for (final child in children) {
       if (child is Card && child.toBeDestroyed) {
-        CardName cardName;
-        if (child.id == 1) cardName = CardName.icecannon;
-        if (child.id == 2) cardName = CardName.warptime;
-        if (child.id == 3)
-          cardName = CardName.coldtouch;
-        else
-          cardName = CardName.icecannon;
+        CardName cardName = cardNameFromId(child);
         discardPile.addCardToTop(cardName);
         remove(child);
       }
     }
+  }
+
+  CardName cardNameFromId(Card card) {
+    CardName cardName;
+    if (card.id == 1) cardName = CardName.icecannon;
+    if (card.id == 2) cardName = CardName.warptime;
+    if (card.id == 3)
+      cardName = CardName.coldtouch;
+    else
+      cardName = CardName.icecannon;
+    return cardName;
   }
 
   void disablePlayerInput(int milliseconds) async {

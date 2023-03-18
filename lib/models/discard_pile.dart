@@ -37,6 +37,7 @@ class DiscardPile extends PositionComponent {
   }
 
   int numberOfCards() {
+    print(cardList.length);
     return cardList.length;
   }
 
