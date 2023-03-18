@@ -39,7 +39,8 @@ class Card extends PositionComponent
   late int startingPriority;
 
   bool toBeDestroyed = false;
-  //bool get getToBeDestroyed => toBeDestroyed;
+
+  int handPosition;
 
   final _collisionColor = Colors.amber;
   final _defaultColor = Colors.cyan;
@@ -59,6 +60,7 @@ class Card extends PositionComponent
     this.power = 0,
     this.imageNumber = 19,
     this.dragStartingPosition,
+    this.handPosition = -1,
   }) : super(size: CardGame.cardSize, anchor: Anchor.center);
 
   factory Card.create(CardName name) {
@@ -295,6 +297,7 @@ class Card extends PositionComponent
       toBeDestroyed = true;
       game.destroyCardsScheduledForDestructionAfterCountdown(
           (1000 * duration + 100).toInt());
+      game.hand.removeAt(handPosition);
       /* game.disableRemainingCardsAndRemovePlayedCard(
           (duration * 1000 + 1).toInt()); */
       //game.activateCards();

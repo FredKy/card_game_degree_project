@@ -118,7 +118,7 @@ class CardGame extends FlameGame
     playerDeck.priority = 100;
     add(playerDeck);
     add(discardPile);
-    dealCards(cardsToDeal: getCardsToDealFromDeck(7));
+    dealCards(cardsToDeal: getCardsToDealFromDeck(1));
 
     add(PlayCardArea()
       ..width = size.x
@@ -146,7 +146,8 @@ class CardGame extends FlameGame
         ..dragStartingPosition = Vector2(size.x / 2, y)
         ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
         ..position = deckPosition
-        ..priority = hand.length + 1);
+        ..priority = hand.length + 1
+        ..handPosition = 0);
       addDealEffects(
           startDelay: 0,
           card: hand[hand.length - 1],
@@ -162,7 +163,8 @@ class CardGame extends FlameGame
           ..dragStartingPosition = Vector2(padding + space * i, y)
           ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
           ..position = deckPosition
-          ..priority = i + 1);
+          ..priority = i + 1
+          ..handPosition = i);
         addDealEffects(
             startDelay: i * dealInterval,
             card: hand[i],
@@ -171,6 +173,7 @@ class CardGame extends FlameGame
         add(hand[i]);
       }
     }
+    print("Hand after deal " + hand.toString());
   }
 
   void moveCardsFromDiscardPileToDeck() async {
@@ -195,8 +198,11 @@ class CardGame extends FlameGame
     await Future.delayed(Duration(
         milliseconds: (dealSpeed * 1000 + c * dealInterval + 300).toInt()));
     for (var card in flyingCards) {
+      CardName cardName = cardNameFromId(card);
+      playerDeck.addCardToTop(cardName);
       card.removeFromParent();
     }
+    print(hand);
     //for (var i = 0; i < flyingCards.length; i++) {}
   }
 
@@ -209,10 +215,8 @@ class CardGame extends FlameGame
     Path path = Path();
     path.lineTo(displacement.x, displacement.y);
     //path.close();
-    card.add(MoveAlongPathEffect(path, onComplete: () {
-      CardName cardName = cardNameFromId(card);
-      playerDeck.addCardToTop(cardName);
-    },
+    card.add(MoveAlongPathEffect(
+        path,
         EffectController(
             startDelay: startDelay, duration: dealSpeed, curve: Curves.ease)));
 
