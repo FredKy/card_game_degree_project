@@ -13,9 +13,10 @@ import 'package:flame/experimental.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
-import 'package:flame/widgets.dart';
 import 'package:flutter/material.dart' hide Card, Image, Draggable;
 import 'package:flame/collisions.dart';
+import 'package:card_game_degree_project/game/utils.dart' as utils;
+import 'package:card_game_degree_project/game/paints.dart' as paints;
 
 import '../models/card.dart';
 
@@ -36,11 +37,8 @@ class CardGame extends FlameGame
     const Rect.fromLTWH(0, 0, cardWidth, cardHeight),
     const Radius.circular(cardRadius),
   );
-  /* static final Vector2 deckPosition = Vector2(1860, 850);
-  static final Vector2 discardPilePosition = Vector2(65, 850); */
   static final Vector2 discardPilePosition = Vector2(1860, 850);
   static final Vector2 deckPosition = Vector2(65, 850);
-  //List<CardName> cardsToDeal = [];
   List<Card> hand = [];
   Deck playerDeck = Deck(cardList: [
     CardName.icecannon,
@@ -75,9 +73,6 @@ class CardGame extends FlameGame
 
   //Timer stuff starts here.
 
-  final TextPaint textConfig = TextPaint(
-    style: const TextStyle(color: Colors.white, fontSize: 20),
-  );
   late Timer countdown;
   late Timer interval;
 
@@ -97,14 +92,15 @@ class CardGame extends FlameGame
     interval = Timer(
       0.01,
       onTick: () {
-        elapsedMilliseconds += 1;
+        /* elapsedMilliseconds += 1;
         if (elapsedMilliseconds == turnStartDelayMS) {
           for (final child in children) {
             if (child is Card) {
               if (child.id != 0) child.canBeMoved = true;
             }
           }
-        }
+        } */
+        elapsedMilliseconds += 1;
       },
       repeat: true,
     );
@@ -154,11 +150,9 @@ class CardGame extends FlameGame
   }
 
   void dealCards(int n) async {
-    //List<Vector2> openPositions = getOpenPositions(n);
     List<Vector2> openPositions = getOpenPositions(n);
     var cardsToDeal = await getCardsToDealFromDeck(n);
     if (cardsToDeal.isEmpty) return;
-    //moveCardsToMakeSpace(n);
     disablePlayerInput((dealSpeed * 1000 + cardsToDeal.length * 100).toInt());
     print(hand);
     var prevHandLength = hand.length;
@@ -210,7 +204,7 @@ class CardGame extends FlameGame
     await Future.delayed(Duration(
         milliseconds: (dealSpeed * 1000 + c * dealInterval + 300).toInt()));
     for (var card in flyingCards) {
-      CardName cardName = cardNameFromId(card);
+      CardName cardName = utils.cardNameFromId(card);
       playerDeck.addCardToBottom(cardName);
       card.removeFromParent();
     }
@@ -230,7 +224,6 @@ class CardGame extends FlameGame
     var displacement = deckPosition - discardPilePosition;
     Path path = Path();
     path.lineTo(displacement.x, displacement.y);
-    //path.close();
     card.add(MoveAlongPathEffect(
         path,
         EffectController(
@@ -253,14 +246,6 @@ class CardGame extends FlameGame
         ),
       ),
     );
-    /* card.add(ScaleEffect.to(
-        Vector2.all(0.3),
-        EffectController(
-          startDelay: startDelay,
-          duration: dealSpeed * 0.6,
-          //reverseDuration: 0.15,
-          curve: Curves.ease,
-        ))); */
   }
 
   void moveCards() {
@@ -304,11 +289,9 @@ class CardGame extends FlameGame
   void moveCardsToMakeSpace(int oldCards) {
     if (oldCards < 1) return;
     double y = 850;
-    //var count = 0;
     List<Card> hand = [];
     for (final child in children) {
       if (child is Card) {
-        //count += 1;
         child.canBeMoved = false;
         if (!child.hasBeenPlayed) hand.add(child);
       }
@@ -329,11 +312,9 @@ class CardGame extends FlameGame
     assert(n > 0);
     List<Vector2> openCardPositions = [];
     double y = 850;
-    //var count = 0;
     List<Card> hand = [];
     for (final child in children) {
       if (child is Card) {
-        //count += 1;
         child.canBeMoved = false;
         if (!child.hasBeenPlayed) hand.add(child);
       }
@@ -380,7 +361,7 @@ class CardGame extends FlameGame
     await Future.delayed(Duration(milliseconds: milliseconds));
     for (final child in children) {
       if (child is Card && child.toBeDestroyed) {
-        CardName cardName = cardNameFromId(child);
+        CardName cardName = utils.cardNameFromId(child);
         discardPile.addCardToTop(cardName);
         hand.removeAt(child.handPosition);
         remove(child);
@@ -391,18 +372,7 @@ class CardGame extends FlameGame
         }
       }
     }
-    print("Hand after played card is destroyed: " + hand.toString());
-  }
-
-  CardName cardNameFromId(Card card) {
-    CardName cardName;
-    if (card.id == 1) cardName = CardName.icecannon;
-    if (card.id == 2) cardName = CardName.warptime;
-    if (card.id == 3)
-      cardName = CardName.coldtouch;
-    else
-      cardName = CardName.icecannon;
-    return cardName;
+    print("Hand after played card is destroyed: $hand");
   }
 
   void disablePlayerInput(int milliseconds) async {
@@ -419,17 +389,17 @@ class CardGame extends FlameGame
     interval.update(dt);
   }
 
-  @override
+  /* @override
   void render(Canvas canvas) {
     super.render(canvas);
-    textConfig.render(
+    paints.timerText.render(
       canvas,
       'Countdown: ${countdown.current.toStringAsPrecision(3)}',
       Vector2(30, 100),
     );
-    textConfig.render(canvas,
+    paints.timerText.render(canvas,
         'Elapsed time in milliseconds: $elapsedMilliseconds', Vector2(30, 130));
-  }
+  } */
 }
 
 void addDealEffects(
@@ -484,8 +454,8 @@ Sprite cardImageSprite(double x, double y, double width, double height) {
 }
 
 Sprite getPlayerSprite(
-    double x, double y, double width, double height, String state) {
-  if (state == "idle") {
+    double x, double y, double width, double height, String sheet) {
+  if (sheet == "idle") {
     return Sprite(
       Flame.images.fromCache('player_idle.png'),
       srcPosition: Vector2(x, y),
@@ -503,7 +473,6 @@ class PlayCardArea extends PositionComponent with CollisionCallbacks {
   static final _paint = Paint()..color = Colors.transparent;
   @override
   FutureOr<void> onLoad() {
-    // TODO: implement onLoad
     add(RectangleHitbox(size: size, isSolid: true)..renderShape = false);
     return super.onLoad();
   }
@@ -519,7 +488,6 @@ class DisableInputBarrier extends PositionComponent with Draggable {
   DisableInputBarrier() : super(size: Vector2(1920, 1080));
   @override
   FutureOr<void> onLoad() {
-    // TODO: implement onLoad
     add(RectangleHitbox(size: size, isSolid: true)..renderShape = false);
     return super.onLoad();
   }
@@ -529,6 +497,7 @@ class DisableInputBarrier extends PositionComponent with Draggable {
     canvas.drawRect(size.toRect(), _paint);
   }
 
+  @override
   bool onDragStart(DragStartInfo startPosition) {
     return false;
   }

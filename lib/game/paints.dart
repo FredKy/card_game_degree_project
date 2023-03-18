@@ -41,3 +41,6 @@ final descriptionTextPaint = TextPaint(
         fontSize: 25,
         fontFamily: 'Yoster',
         shadows: getShadows(2)));
+final TextPaint timerText = TextPaint(
+  style: const TextStyle(color: Colors.white, fontSize: 20),
+);

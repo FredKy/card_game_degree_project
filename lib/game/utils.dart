@@ -1,8 +1,9 @@
 library utils;
 
 import 'dart:math';
+import 'package:card_game_degree_project/models/card.dart';
 import 'package:flame/game.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Card;
 
 List<Shadow> getShadows(double n) {
   return [
@@ -24,7 +25,6 @@ List<Shadow> getShadows(double n) {
         color: Colors.black),
   ];
 }
-
 
 T getRandomElement<T>(List<T> list) {
   final random = Random();
@@ -54,4 +54,15 @@ num fourth(double x, double lifespan) {
   } else {
     return pow((lifespan - (x - lifespan / parts)) / lifespan, 4);
   }
+}
+
+CardName cardNameFromId(Card card) {
+  CardName cardName;
+  if (card.id == 1) cardName = CardName.icecannon;
+  if (card.id == 2) cardName = CardName.warptime;
+  if (card.id == 3)
+    cardName = CardName.coldtouch;
+  else
+    cardName = CardName.icecannon;
+  return cardName;
 }
