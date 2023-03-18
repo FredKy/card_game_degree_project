@@ -144,33 +144,25 @@ class CardGame extends FlameGame
     if (cardsToDeal.length == 1) {
       hand.add(Card.create(cardsToDeal[0])
         ..dragStartingPosition = Vector2(size.x / 2, y)
-        ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1));
-      hand[0].position = deckPosition;
-      hand[0].priority = 1;
+        ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
+        ..position = deckPosition
+        ..priority = hand.length + 1);
       addDealEffects(
           startDelay: 0,
-          card: hand[0],
+          card: hand[hand.length - 1],
           dealSpeed: dealSpeed,
           moveToPosition: Vector2(size.x / 2, y));
-      add(hand[0]);
+      add(hand[hand.length - 1]);
     } else if (cardsToDeal.length > 1) {
-      /* var padding;
-      if (cardsToDeal.length > 5) {
-        padding = 200;
-      } else {
-        padding = 200 + 160 * (5 - cardsToDeal.length);
-      } */
       var padding =
           (cardsToDeal.length > 5) ? 320 : 320 + 100 * (5 - cardsToDeal.length);
       var space = (size.x - 2 * padding) / (cardsToDeal.length - 1);
       for (var i = 0; i < cardsToDeal.length; i++) {
-        //var tempCard;
         hand.add(Card.create(cardsToDeal[i])
           ..dragStartingPosition = Vector2(padding + space * i, y)
-          ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1));
-        hand[i].position = deckPosition;
-        //hand[i].priority = cardsToDeal.length - i;
-        hand[i].priority = i + 1;
+          ..scale = (animated) ? Vector2(0, 0) : Vector2(1, 1)
+          ..position = deckPosition
+          ..priority = i + 1);
         addDealEffects(
             startDelay: i * dealInterval,
             card: hand[i],
