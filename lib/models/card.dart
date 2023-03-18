@@ -294,10 +294,11 @@ class Card extends PositionComponent
           Duration(milliseconds: (duration * 1000 + 1).toInt())); */
       //delayTime((duration * 1000 + 1).toInt());
       game.disablePlayerInput((1000 * duration + 1).toInt());
+      //game.hand.removeAt(handPosition);
       toBeDestroyed = true;
       game.destroyCardsScheduledForDestructionAfterCountdown(
           (1000 * duration + 100).toInt());
-      game.hand.removeAt(handPosition);
+
       /* game.disableRemainingCardsAndRemovePlayedCard(
           (duration * 1000 + 1).toInt()); */
       //game.activateCards();

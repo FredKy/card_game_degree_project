@@ -18,7 +18,8 @@ class DiscardPile extends PositionComponent {
             size: CardGame.cardSize,
             anchor: Anchor.center,
             scale: Vector2.all(0.4),
-            position: CardGame.discardPilePosition);
+            position: CardGame.discardPilePosition,
+            priority: 500);
 
   void addCardToTop(CardName cardName) {
     cardList.add(cardName);

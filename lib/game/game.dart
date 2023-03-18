@@ -115,10 +115,9 @@ class CardGame extends FlameGame
     add(player);
 
     playerDeck.shuffle();
-    playerDeck.priority = 100;
-    add(playerDeck);
+    add(playerDeck..priority = 500);
     add(discardPile);
-    dealCards(cardsToDeal: getCardsToDealFromDeck(1));
+    dealCards(cardsToDeal: getCardsToDealFromDeck(3));
 
     add(PlayCardArea()
       ..width = size.x
@@ -171,13 +170,16 @@ class CardGame extends FlameGame
             dealSpeed: dealSpeed,
             moveToPosition: Vector2(padding + space * i, y));
         add(hand[i]);
+        print(hand);
+        /* hand.clear();
+        print(hand); */
       }
     }
     print("Hand after deal " + hand.toString());
   }
 
   void moveCardsFromDiscardPileToDeck() async {
-    List<Card> flyingCards = [];
+    var flyingCards = [];
     discardPile.shuffle();
     var c = 5;
     final numberOfCards = discardPile.numberOfCards();
@@ -186,8 +188,7 @@ class CardGame extends FlameGame
         ..scale = Vector2.all(0.3)
         ..position = discardPilePosition
         ..canBeMoved = false
-        ..priority = 5
-        ..toBeDestroyed);
+        ..priority = 5);
       addFlyingCardEffects(
           startDelay: c * i * dealInterval / numberOfCards,
           card: flyingCards[i],
@@ -195,6 +196,10 @@ class CardGame extends FlameGame
           moveToPosition: deckPosition);
       add(flyingCards[i]);
     }
+    print(flyingCards);
+    flyingCards.forEach((element) {
+      print(element.priority);
+    });
     await Future.delayed(Duration(
         milliseconds: (dealSpeed * 1000 + c * dealInterval + 300).toInt()));
     for (var card in flyingCards) {
@@ -202,7 +207,11 @@ class CardGame extends FlameGame
       playerDeck.addCardToTop(cardName);
       card.removeFromParent();
     }
-    print(hand);
+    print(flyingCards);
+    flyingCards.forEach((element) {
+      print(element.priority);
+    });
+    flyingCards.clear();
     //for (var i = 0; i < flyingCards.length; i++) {}
   }
 
@@ -220,7 +229,7 @@ class CardGame extends FlameGame
         EffectController(
             startDelay: startDelay, duration: dealSpeed, curve: Curves.ease)));
 
-    card.add(MoveByEffect(
+    /* card.add(MoveByEffect(
         Vector2(0, -500),
         EffectController(
             startDelay: startDelay,
@@ -236,7 +245,7 @@ class CardGame extends FlameGame
           curve: Curves.ease,
         ),
       ),
-    );
+    ); */
     /* card.add(ScaleEffect.to(
         Vector2.all(0.3),
         EffectController(
@@ -313,9 +322,16 @@ class CardGame extends FlameGame
       if (child is Card && child.toBeDestroyed) {
         CardName cardName = cardNameFromId(child);
         discardPile.addCardToTop(cardName);
+        hand.removeAt(child.handPosition);
         remove(child);
+        //
+        //For loop to refresh the stored hand position indeces for the cards.
+        for (var i = 0; i < hand.length; i++) {
+          hand[i].handPosition = i;
+        }
       }
     }
+    print("Hand after played card is destroyed: " + hand.toString());
   }
 
   CardName cardNameFromId(Card card) {
