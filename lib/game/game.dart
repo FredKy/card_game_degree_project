@@ -5,6 +5,7 @@ import 'package:card_game_degree_project/game/deal_button.dart';
 import 'package:card_game_degree_project/game/misc_button.dart';
 import 'package:card_game_degree_project/game/reshuffle_button.dart';
 import 'package:card_game_degree_project/game/player.dart';
+import 'package:card_game_degree_project/game/skeleton_warrior.dart';
 import 'package:card_game_degree_project/models/deck.dart';
 import 'package:card_game_degree_project/models/discard_pile.dart';
 import 'package:flame/components.dart';
@@ -108,6 +109,9 @@ class CardGame extends FlameGame
     interval.start();
 
     //add(ScreenHitbox());
+
+    SkeletonWarrior skeletonWarrior = SkeletonWarrior();
+    add(skeletonWarrior);
 
     add(player);
 
