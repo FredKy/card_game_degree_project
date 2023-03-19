@@ -86,7 +86,7 @@ class CardGame extends FlameGame
     await super.onLoad();
     await Flame.images.load(spriteSheetPath);
     await Flame.images.load('player_idle.png');
-    await Flame.images.load('skeleton_warrior_idle');
+    await Flame.images.load('skeleton_warrior_idle.png');
 
     camera.viewport = FixedResolutionViewport(Vector2(1920, 1080));
 
@@ -110,7 +110,7 @@ class CardGame extends FlameGame
 
     //add(ScreenHitbox());
 
-    SkeletonWarrior skeletonWarrior = SkeletonWarrior();
+    SkeletonWarrior skeletonWarrior = SkeletonWarrior()..position = Vector2(1620, 1080 / 2.5);
     add(skeletonWarrior);
 
     add(player);
