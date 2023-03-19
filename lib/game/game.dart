@@ -85,6 +85,7 @@ class CardGame extends FlameGame
     await super.onLoad();
     await Flame.images.load(spriteSheetPath);
     await Flame.images.load('player_idle.png');
+    await Flame.images.load('skeleton_warrior_idle');
 
     camera.viewport = FixedResolutionViewport(Vector2(1920, 1080));
 
@@ -458,6 +459,22 @@ Sprite getPlayerSprite(
   if (sheet == "idle") {
     return Sprite(
       Flame.images.fromCache('player_idle.png'),
+      srcPosition: Vector2(x, y),
+      srcSize: Vector2(width, height),
+    );
+  }
+  return Sprite(
+    Flame.images.fromCache(spriteSheetPath),
+    srcPosition: Vector2(x, y),
+    srcSize: Vector2(width, height),
+  );
+}
+
+Sprite getEnemySprite(
+    double x, double y, double width, double height, String sheet) {
+  if (sheet == "skeleton_warrior_idle") {
+    return Sprite(
+      Flame.images.fromCache('skeleton_warrior_idle.png'),
       srcPosition: Vector2(x, y),
       srcSize: Vector2(width, height),
     );
