@@ -13,12 +13,12 @@ class DealButton extends PositionComponent
   bool onTapDown(TapDownInfo info) {
     print("tap down");
     //game.moveCardsFromDiscardPileToDeck();
-
-    if (game.hand.isEmpty) {
-      game.dealCards(2);
+    game.dealCards(game.playerDeck.cardList.length);
+    /* if (game.hand.isEmpty) {
+      game.dealCards(game.playerDeck.cardList.length);
     } else {
       print("Hand not empty.");
-    }
+    } */
     print(game.hand);
     return true;
   }

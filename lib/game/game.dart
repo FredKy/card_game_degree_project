@@ -58,7 +58,7 @@ class CardGame extends FlameGame
     CardName.coldtouch,
     CardName.warptime,
     CardName.icecannon,
-    CardName.icecannon,
+    CardName.warptime,
   ]);
   bool animated = true;
   double dealSpeed = 1;
@@ -110,7 +110,8 @@ class CardGame extends FlameGame
 
     //add(ScreenHitbox());
 
-    SkeletonWarrior skeletonWarrior = SkeletonWarrior()..position = Vector2(1620, 1080 / 2.5);
+    SkeletonWarrior skeletonWarrior = SkeletonWarrior()
+      ..position = Vector2(1620, 1080 / 2.5);
     add(skeletonWarrior);
 
     add(player);
@@ -125,9 +126,15 @@ class CardGame extends FlameGame
       ..width = size.x
       ..height = size.y / 3.5);
 
-    add(ReshuffleButton()..position = Vector2(1800, 100));
-    add(DealButton()..position = Vector2(1700, 100));
-    add(MiscButton()..position = Vector2(1600, 100));
+    add(ReshuffleButton()
+      ..position = Vector2(1800, 100)
+      ..size = Vector2.all(100));
+    add(DealButton()
+      ..position = Vector2(1600, 100)
+      ..size = Vector2.all(100));
+    add(MiscButton()
+      ..position = Vector2(1400, 100)
+      ..size = Vector2.all(100));
   }
 
   Future<List<CardName>> getCardsToDealFromDeck(int n) async {

@@ -58,11 +58,14 @@ num fourth(double x, double lifespan) {
 
 CardName cardNameFromId(Card card) {
   CardName cardName;
-  if (card.id == 1) cardName = CardName.icecannon;
-  if (card.id == 2) cardName = CardName.warptime;
-  if (card.id == 3)
-    cardName = CardName.coldtouch;
-  else
+  if (card.id == 1) {
     cardName = CardName.icecannon;
+  } else if (card.id == 2) {
+    cardName = CardName.warptime;
+  } else if (card.id == 3) {
+    cardName = CardName.coldtouch;
+  } else {
+    cardName = CardName.icecannon;
+  }
   return cardName;
 }
